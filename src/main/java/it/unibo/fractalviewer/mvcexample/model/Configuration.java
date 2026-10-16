@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model;
+package it.unibo.fractalviewer.mvcexample.model;
 
 /**
  * Encapsulates the concept of configuration.

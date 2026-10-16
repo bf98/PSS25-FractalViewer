@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.fractalviewer;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -36,7 +36,7 @@ public final class JavaFXApp extends Application {
         public static void main(final String... args) {
             launch(JavaFXApp.class, args);
             /*
-            The following line raises: Error: class it.unibo.samplejavafx.JavaFXApp$Main
+            The following line raises: Error: class it.unibo.fractalviewer.JavaFXApp$Main
             is not a subclass of javafx.application.Application
             Because if you do not provide the Application subclass to launch() it will consider the enclosing class)
             */

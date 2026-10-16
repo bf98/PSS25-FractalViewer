@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.fractalviewer;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

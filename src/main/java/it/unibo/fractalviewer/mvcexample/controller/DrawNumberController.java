@@ -1,6 +1,6 @@
-package it.unibo.samplejavafx.mvcexample.controller;
+package it.unibo.fractalviewer.mvcexample.controller;
 
-import it.unibo.samplejavafx.mvcexample.view.DrawNumberView;
+import it.unibo.fractalviewer.mvcexample.view.DrawNumberView;
 
 /**
  * Controller interface.

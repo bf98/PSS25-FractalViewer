@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample;
+package it.unibo.fractalviewer.mvcexample;
 
 import javafx.application.Application;
 

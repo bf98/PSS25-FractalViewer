@@ -1,11 +1,11 @@
-package it.unibo.samplejavafx.mvcexample.model;
+package it.unibo.fractalviewer.mvcexample.model;
 
 import java.util.Random;
 
-import static it.unibo.samplejavafx.mvcexample.model.DrawResult.DrawOutcome.YOURS_HIGH;
-import static it.unibo.samplejavafx.mvcexample.model.DrawResult.DrawOutcome.YOURS_LOW;
-import static it.unibo.samplejavafx.mvcexample.model.DrawResult.DrawOutcome.YOU_LOST;
-import static it.unibo.samplejavafx.mvcexample.model.DrawResult.DrawOutcome.YOU_WON;
+import static it.unibo.fractalviewer.mvcexample.model.DrawResult.DrawOutcome.YOURS_HIGH;
+import static it.unibo.fractalviewer.mvcexample.model.DrawResult.DrawOutcome.YOURS_LOW;
+import static it.unibo.fractalviewer.mvcexample.model.DrawResult.DrawOutcome.YOU_LOST;
+import static it.unibo.fractalviewer.mvcexample.model.DrawResult.DrawOutcome.YOU_WON;
 
 /**
  *

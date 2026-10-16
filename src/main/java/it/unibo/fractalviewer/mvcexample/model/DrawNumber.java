@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx.mvcexample.model;
+package it.unibo.fractalviewer.mvcexample.model;
 
 /**
  * This class models a draw number game.

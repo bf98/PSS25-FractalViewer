@@ -1,4 +1,4 @@
-package it.unibo.samplejavafx;
+package it.unibo.fractalviewer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
