@@ -1,4 +1,4 @@
-package it.unibo.fractalviewer.mvcexample.view;
+package it.unibo.fractalviewer.mvc.view;
 
 import java.util.concurrent.CompletableFuture;
 import javafx.scene.Scene;

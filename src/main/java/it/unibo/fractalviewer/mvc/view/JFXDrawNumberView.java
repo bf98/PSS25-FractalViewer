@@ -1,8 +1,8 @@
-package it.unibo.fractalviewer.mvcexample.view;
+package it.unibo.fractalviewer.mvc.view;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import it.unibo.fractalviewer.mvcexample.controller.DrawNumberController;
-import it.unibo.fractalviewer.mvcexample.model.DrawResult;
+import it.unibo.fractalviewer.mvc.controller.DrawNumberController;
+import it.unibo.fractalviewer.mvc.model.DrawResult;
 import java.util.concurrent.CompletableFuture;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;

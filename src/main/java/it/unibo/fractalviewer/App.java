@@ -4,7 +4,7 @@
 
 package it.unibo.fractalviewer;
 
-import it.unibo.fractalviewer.mvcexample.EntryPoint;
+import it.unibo.fractalviewer.mvc.EntryPoint;
 import javafx.application.Application;
 
 /** Main application entry-point's class. */

@@ -1,4 +1,4 @@
-package it.unibo.fractalviewer.mvcexample.model;
+package it.unibo.fractalviewer.mvc.model;
 
 /**
  * This record models the result of a draw attempt.

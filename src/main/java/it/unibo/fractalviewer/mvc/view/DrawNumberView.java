@@ -1,6 +1,6 @@
-package it.unibo.fractalviewer.mvcexample.view;
+package it.unibo.fractalviewer.mvc.view;
 
-import it.unibo.fractalviewer.mvcexample.model.DrawResult;
+import it.unibo.fractalviewer.mvc.model.DrawResult;
 
 /**
  *

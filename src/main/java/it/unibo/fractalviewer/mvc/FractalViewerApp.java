@@ -1,12 +1,12 @@
-package it.unibo.fractalviewer.mvcexample;
+package it.unibo.fractalviewer.mvc;
 
 import javafx.application.Application;
 
 /**
  * This application is a porting of the Swing MVC application from OOP course at UNIBO.
  */
-public final class DrawNumberApp {
-    private DrawNumberApp() {
+public final class FractalViewerApp {
+    private FractalViewerApp() {
 
     }
 

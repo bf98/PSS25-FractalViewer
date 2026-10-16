@@ -1,9 +1,9 @@
-package it.unibo.fractalviewer.mvcexample;
+package it.unibo.fractalviewer.mvc;
 
-import it.unibo.fractalviewer.mvcexample.controller.DrawNumberController;
-import it.unibo.fractalviewer.mvcexample.controller.DrawNumberControllerImpl;
-import it.unibo.fractalviewer.mvcexample.view.JFXDrawNumberView;
-import it.unibo.fractalviewer.mvcexample.view.PrintStreamView;
+import it.unibo.fractalviewer.mvc.controller.DrawNumberController;
+import it.unibo.fractalviewer.mvc.controller.DrawNumberControllerImpl;
+import it.unibo.fractalviewer.mvc.view.JFXDrawNumberView;
+import it.unibo.fractalviewer.mvc.view.PrintStreamView;
 import java.io.FileNotFoundException;
 import java.util.List;
 

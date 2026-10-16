@@ -1,4 +1,4 @@
-package it.unibo.fractalviewer.mvcexample.model;
+package it.unibo.fractalviewer.mvc.model;
 
 /**
  * Encapsulates the concept of configuration.

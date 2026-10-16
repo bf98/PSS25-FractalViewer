@@ -1,6 +1,6 @@
-package it.unibo.fractalviewer.mvcexample.controller;
+package it.unibo.fractalviewer.mvc.controller;
 
-import it.unibo.fractalviewer.mvcexample.view.DrawNumberView;
+import it.unibo.fractalviewer.mvc.view.DrawNumberView;
 
 /**
  * Controller interface.

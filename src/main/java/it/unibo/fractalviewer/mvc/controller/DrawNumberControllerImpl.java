@@ -1,10 +1,10 @@
-package it.unibo.fractalviewer.mvcexample.controller;
+package it.unibo.fractalviewer.mvc.controller;
 
-import it.unibo.fractalviewer.mvcexample.model.Configuration;
-import it.unibo.fractalviewer.mvcexample.model.DrawNumber;
-import it.unibo.fractalviewer.mvcexample.model.DrawNumberImpl;
-import it.unibo.fractalviewer.mvcexample.model.DrawResult;
-import it.unibo.fractalviewer.mvcexample.view.DrawNumberView;
+import it.unibo.fractalviewer.mvc.model.Configuration;
+import it.unibo.fractalviewer.mvc.model.DrawNumber;
+import it.unibo.fractalviewer.mvc.model.DrawNumberImpl;
+import it.unibo.fractalviewer.mvc.model.DrawResult;
+import it.unibo.fractalviewer.mvc.view.DrawNumberView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
