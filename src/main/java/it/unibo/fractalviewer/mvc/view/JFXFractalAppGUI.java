@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
@@ -30,7 +32,12 @@ public final class JFXFractalAppGUI extends Application {
         //All'interno della toolbar andiamo a creare e ad inserire i pulsanti che utilizzeremo
         //Per la gestione del canvas e del frattale
         Button applyButton = new Button("Applicare la risoluzione");
+        TextArea textArea = new TextArea();
+        textArea.setEditable(false);
+        ScrollPane sl = new ScrollPane();
+        applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
+        exportButton.setOnAction(e -> textArea.appendText("Non è possibile esportare il frattale.\n"));
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
         TextField widthField = new TextField();
@@ -44,11 +51,12 @@ public final class JFXFractalAppGUI extends Application {
         //Creiamo il canvas sul quale verrà applicato il frattale, passandogli i valori
         //Definiti alla creazione dell'App
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-        //
+        sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
         gc.fillRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
-        borderPane.setCenter(canvas);
+        borderPane.setLeft(textArea);
+        borderPane.setCenter(sl);
         borderPane.setBottom(toolbar);       
         Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         primaryStage.setTitle("FractalViewer");
