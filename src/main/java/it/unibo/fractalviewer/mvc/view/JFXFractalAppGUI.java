@@ -1,35 +1,40 @@
 package it.unibo.fractalviewer.mvc.view;
-
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 //Creazione della view della GUI, appropriatamente chiamata JFXFractalAppGUI
 public final class JFXFractalAppGUI extends Application {
     
-    //Definiamo i valori di partenza del canvas e della finestra dell'app 
+    //Definisco i valori di partenza del canvas e quelli minimi della finestra 
     private static final int CANVAS_WIDTH = 800;
     private static final int CANVAS_HEIGHT = 600;
     private static final int WINDOW_WIDTH = 1100;
     private static final int WINDOW_HEIGHT = 720;
-
-
+    private static final int WIDTHFIELD_WIDTH = 190;
+    private static final int HEIGHTFIELD_WIDTH = 190;
     @Override
-    //Creiamo lo stage (ovverosia la finestra principale) dell'app e la chiamamo primaryStage
+    //Imposto lo stage (ovverosia la finestra principale) dell'app e la chiamo primaryStage
     public void start(final Stage primaryStage) {
-        //Andiamo poi a creare il layout della GUI
-        //Per iniziamo, creiamo il BorderPane per organizzare i componenti della GUI
+        //Vado poi a creare il layout della GUI
+        //Per iniziare, creo il BorderPane per organizzare i componenti della GUI
         BorderPane borderPane = new BorderPane();
-        //All'interno della toolbar andiamo a creare e ad inserire i pulsanti che utilizzeremo
+        //All'interno della toolbar vado a creare e ad inserire i pulsanti che utilizzeremo
         //Per la gestione del canvas e del frattale
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
@@ -38,26 +43,48 @@ public final class JFXFractalAppGUI extends Application {
         applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
         exportButton.setOnAction(e -> textArea.appendText("Non è possibile esportare il frattale.\n"));
+        Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
+        resetNavigation.setOnAction(e-> textArea.appendText("Il frattale è gia nella posizione iniziale\n"));
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
+        heightField.setAlignment(Pos.CENTER);
         TextField widthField = new TextField();
         widthField.setPromptText("Inserisci la larghezza del canvas...");
-        ToolBar toolbar = new ToolBar(
+        widthField.setAlignment(Pos.CENTER);
+        ObservableList<String> fractals =FXCollections.observableArrayList(
+        "Mandelbrot", "Julia"
+    );
+        ComboBox<String> fractalType = new ComboBox<String>();
+        fractalType.setItems(fractals);
+        fractalType.setPromptText("Selezionare il frattale");
+        ToolBar fractalOptions = new ToolBar(
+            fractalType
+        );
+        VBox configBox = new VBox(
+            20.0,
             applyButton,
             exportButton,
+            resetNavigation,
             widthField,
             heightField
         );
-        //Creiamo il canvas sul quale verrà applicato il frattale, passandogli i valori
+        widthField.setMaxWidth(WIDTHFIELD_WIDTH);
+        heightField.setMaxWidth(HEIGHTFIELD_WIDTH);
+        configBox.setAlignment(Pos.CENTER);
+        //Creo la VBox contenenti i parametri per la gestione del frattale e il log
+        VBox paramBox = new VBox(configBox, textArea);
+        VBox.setVgrow(configBox, Priority.SOMETIMES);
+        VBox.setVgrow(textArea, Priority.SOMETIMES);
+        //Creo il canvas sul quale verrà applicato il frattale, passandogli i valori
         //Definiti alla creazione dell'App
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
         sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
         gc.fillRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
-        borderPane.setLeft(textArea);
-        borderPane.setCenter(sl);
-        borderPane.setBottom(toolbar);       
+        borderPane.setRight(paramBox);
+        borderPane.setBottom(fractalOptions);
+        borderPane.setCenter(sl);     
         Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         primaryStage.setTitle("FractalViewer");
         primaryStage.setScene(scene);

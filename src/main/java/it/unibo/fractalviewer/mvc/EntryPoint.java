@@ -1,19 +1,15 @@
 package it.unibo.fractalviewer.mvc;
-
-import it.unibo.fractalviewer.mvc.controller.DrawNumberController;
-import it.unibo.fractalviewer.mvc.controller.DrawNumberControllerImpl;
-import it.unibo.fractalviewer.mvc.view.JFXDrawNumberView;
-import it.unibo.fractalviewer.mvc.view.PrintStreamView;
-import java.io.FileNotFoundException;
-import java.util.List;
-
-import javafx.application.Application;
-import javafx.geometry.BoundingBox;
-import javafx.stage.Stage;
+// import java.io.FileNotFoundException;
+// import java.util.List;
+// import javafx.application.Application;
+// import javafx.geometry.BoundingBox;
+// import javafx.stage.Stage;
 
 /**
  * JavaFX application for the "draw number" game.
  */
+
+/* *
 public final class EntryPoint extends Application {
 
     private final DrawNumberController controller = new DrawNumberControllerImpl();
@@ -37,3 +33,4 @@ public final class EntryPoint extends Application {
         }
     }
 }
+*/

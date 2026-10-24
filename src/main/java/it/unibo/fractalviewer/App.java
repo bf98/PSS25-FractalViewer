@@ -4,7 +4,7 @@
 
 package it.unibo.fractalviewer;
 
-import it.unibo.fractalviewer.mvc.EntryPoint;
+// import it.unibo.fractalviewer.mvc.EntryPoint;
 import javafx.application.Application;
 
 /** Main application entry-point's class. */
@@ -18,7 +18,7 @@ public final class App {
      * @param args passed to JavaFX.
      */
     public static void main(final String[] args) {
-        Application.launch(EntryPoint.class, args);
+        // Application.launch(EntryPoint.class, args);
         // The following line raises: Error: class it.unibo.fractalviewer.App is not a subclass of javafx.application.Application
         // JavaFXApp.launch(args);
         // While the following would do just fine:
