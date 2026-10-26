@@ -54,11 +54,18 @@ public final class JFXFractalAppGUI extends Application {
         ObservableList<String> fractals =FXCollections.observableArrayList(
         "Mandelbrot", "Julia"
     );
+        ObservableList<String> palettes =FXCollections.observableArrayList(
+        "Grayscale", "Rainbow"
+    );
         ComboBox<String> fractalType = new ComboBox<String>();
         fractalType.setItems(fractals);
         fractalType.setPromptText("Selezionare il frattale");
+        ComboBox<String> paletteType = new ComboBox<String>();
+        paletteType.setItems(palettes);
+        paletteType.setPromptText("Selezionare la palette");
         ToolBar fractalOptions = new ToolBar(
-            fractalType
+            fractalType,
+            paletteType
         );
         VBox configBox = new VBox(
             20.0,
