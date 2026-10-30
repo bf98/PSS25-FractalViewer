@@ -26,6 +26,7 @@ public final class MandelbrotCalculator implements FractalCalculator {
 		 * @param imaginary La componente immaginaria del punto complesso.
 		 * @param maxIterations Il numero massimo di iterazioni consentite.
 		 * @return Il numero di iterazioni eseguite prima della fuga o del raggiungimento del limite massimo.
+		 * @throws IllegalArgumentsException se i parametri non sono validi.
 		 */
 		@Override
 		public int calculate(final double real, final double imaginary, final int maxIterations) {
