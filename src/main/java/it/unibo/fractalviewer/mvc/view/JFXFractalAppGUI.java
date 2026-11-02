@@ -1,7 +1,13 @@
 package it.unibo.fractalviewer.mvc.view;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -12,10 +18,12 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -58,7 +66,6 @@ public final class JFXFractalAppGUI extends Application {
         // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
         applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
-        exportButton.setOnAction(e -> textArea.appendText("Non è possibile esportare il frattale.\n"));
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e-> textArea.appendText("Il frattale è gia nella posizione iniziale\n"));
         // Crea i campi per il ridimensionamento del canvas.
@@ -104,6 +111,7 @@ public final class JFXFractalAppGUI extends Application {
         VBox.setVgrow(textArea, Priority.SOMETIMES);
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
         Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
@@ -143,6 +151,49 @@ public final class JFXFractalAppGUI extends Application {
             // JavaFXApp.launch(args);
             // Whereas the following would do just fine:
             // JavaFXApp.run(args)
+        }
+    }
+
+    /**
+     * Configura l'exportButton per esportare il canvas in un immagine formato PNG.
+     * @param canvas Canvas contenente il frattale
+     * @param textArea Messaggio stampato nella textArea a seconda dell'esito
+     * @param primaryStage Finestra della GUI 
+     */
+    private void handleExport(Canvas canvas, TextArea textArea, Stage primaryStage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("fractal.png");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file == null) {
+            return;
+        }
+
+        // Esporta immagine visualizzata
+        WritableImage image = new WritableImage(
+            (int) canvas.getWidth(),
+            (int) canvas.getHeight()
+        );
+
+        canvas.snapshot(null, image);
+
+        try 
+        {
+            ImageIO.write
+            (
+                SwingFXUtils.fromFXImage(image, null),
+                "png",
+                file
+            );
+
+            textArea.appendText("Frattale esportato correttamente.\n");
+
+        } 
+        
+        catch (IOException ex) 
+        {
+            textArea.appendText("Errore durante l'esportazione.\n");
+            ex.printStackTrace();
         }
     }
 }
