@@ -31,10 +31,16 @@ import javafx.stage.Stage;
  */
 public final class JFXFractalAppGUI extends Application {
     /** Larghezza iniziale del canvas, in pixel. */
-    private static final int CANVAS_WIDTH = 800;
+    private static final int BASE_CANVAS_WIDTH = 800;
 
     /** Altezza iniziale del canvas, in pixel. */
-    private static final int CANVAS_HEIGHT = 600;
+    private static final int BASE_CANVAS_HEIGHT = 600;
+
+    /** Larghezza variabile del canvas, in pixel. */
+    private int canvasWidth = BASE_CANVAS_WIDTH;
+    
+    /** Altezza variabile del canvas, in pixel. */
+    private int canvasHeight = BASE_CANVAS_HEIGHT;
 
     /** Larghezza iniziale della finestra, in pixel. */
     private static final int WINDOW_WIDTH = 1100;
@@ -110,12 +116,12 @@ public final class JFXFractalAppGUI extends Application {
         VBox.setVgrow(configBox, Priority.SOMETIMES);
         VBox.setVgrow(textArea, Priority.SOMETIMES);
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
-        Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
         exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
-        gc.fillRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+        gc.fillRect(0, 0, canvasWidth, canvasHeight);
         borderPane.setRight(paramBox);
         borderPane.setBottom(fractalOptions);
         borderPane.setCenter(sl);     
@@ -155,7 +161,7 @@ public final class JFXFractalAppGUI extends Application {
     }
 
     /**
-     * Configura l'exportButton per esportare il canvas in un immagine formato PNG.
+     * Esegue l'exportButton per esportare il canvas in un immagine formato PNG.
      * @param canvas Canvas contenente il frattale
      * @param textArea Messaggio stampato nella textArea a seconda dell'esito
      * @param primaryStage Finestra della GUI 
@@ -185,14 +191,12 @@ public final class JFXFractalAppGUI extends Application {
                 "png",
                 file
             );
-
             textArea.appendText("Frattale esportato correttamente.\n");
-
         } 
         
         catch (IOException ex) 
         {
-            textArea.appendText("Errore durante l'esportazione.\n");
+            textArea.appendText("Errore durante l'esportazione: " + ex + "\n");
             ex.printStackTrace();
         }
     }
