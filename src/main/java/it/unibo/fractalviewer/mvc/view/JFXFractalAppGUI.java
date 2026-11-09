@@ -26,6 +26,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import it.unibo.fractalviewer.mvc.model.FractalCalculator;
+import it.unibo.fractalviewer.mvc.model.MandelbrotCalculator;
+import it.unibo.fractalviewer.mvc.model.JuliaCalculator;
+import it.unibo.fractalviewer.mvc.model.FractalRenderer;
+
+import javafx.scene.canvas.Canvas;
+import javafx.scene.image.PixelWriter;
+
 /**
  * Implementa la GUI dell'applicazione FractalViewer utilizzando JavaFX.
  */
@@ -117,11 +125,15 @@ public final class JFXFractalAppGUI extends Application {
         VBox.setVgrow(textArea, Priority.SOMETIMES);
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+				// Test disegno Frattale
+				drawMandelbrot(canvas);
         exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
+				/*
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
         gc.fillRect(0, 0, canvasWidth, canvasHeight);
+				*/
         borderPane.setRight(paramBox);
         borderPane.setBottom(fractalOptions);
         borderPane.setCenter(sl);     
@@ -200,4 +212,42 @@ public final class JFXFractalAppGUI extends Application {
             ex.printStackTrace();
         }
     }
+
+		private void drawJulia(Canvas canvas) {
+
+			FractalCalculator calculator = new JuliaCalculator();
+			FractalRenderer renderer = new FractalRenderer(calculator);
+
+			int width = (int) canvas.getWidth();
+			int height = (int) canvas.getHeight();
+
+			int[] pixels = renderer.render(width, height, -0.5, 0.0, 0.005, 100);
+
+			PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
+
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					writer.setArgb(x, y, pixels[y * width + x]);	
+				}
+			}
+		}
+
+		private void drawMandelbrot(Canvas canvas) {
+
+			FractalCalculator calculator = new MandelbrotCalculator();
+			FractalRenderer renderer = new FractalRenderer(calculator);
+
+			int width = (int) canvas.getWidth();
+			int height = (int) canvas.getHeight();
+
+			int[] pixels = renderer.render(width, height, -0.5, 0.0, 0.005, 100);
+
+			PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
+
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					writer.setArgb(x, y, pixels[y * width + x]);	
+				}
+			}
+		}
 }
