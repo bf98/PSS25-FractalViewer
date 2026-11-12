@@ -65,3 +65,13 @@ application {
     // Define the main class for the application
     mainClass.set(main)
 }
+
+tasks.named<Javadoc>("javadoc") {
+    (options as StandardJavadocDocletOptions).apply {
+        encoding = "UTF-8"
+        docEncoding = "UTF-8"
+        charSet = "UTF-8"
+
+        addBooleanOption("Xdoclint:all,-missing", true)
+    }
+}
