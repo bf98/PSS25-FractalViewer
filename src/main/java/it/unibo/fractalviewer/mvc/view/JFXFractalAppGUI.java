@@ -1,7 +1,13 @@
 package it.unibo.fractalviewer.mvc.view;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -12,53 +18,87 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-//Creazione della view della GUI, appropriatamente chiamata JFXFractalAppGUI
+/**
+ * Implementa la GUI dell'applicazione FractalViewer utilizzando JavaFX.
+ */
 public final class JFXFractalAppGUI extends Application {
+    /** Larghezza iniziale del canvas, in pixel. */
+    private static final int BASE_CANVAS_WIDTH = 800;
+
+    /** Altezza iniziale del canvas, in pixel. */
+    private static final int BASE_CANVAS_HEIGHT = 600;
+
+    /** Larghezza variabile del canvas, in pixel. */
+    private int canvasWidth = BASE_CANVAS_WIDTH;
     
-    //Definisco i valori di partenza del canvas e quelli minimi della finestra 
-    private static final int CANVAS_WIDTH = 800;
-    private static final int CANVAS_HEIGHT = 600;
+    /** Altezza variabile del canvas, in pixel. */
+    private int canvasHeight = BASE_CANVAS_HEIGHT;
+
+    /** Larghezza iniziale della finestra, in pixel. */
     private static final int WINDOW_WIDTH = 1100;
+
+    /** Altezza iniziale della finestra, in pixel. */
     private static final int WINDOW_HEIGHT = 720;
+
+    /** Larghezza massima del campo per la larghezza del canvas, in pixel. */
     private static final int WIDTHFIELD_WIDTH = 190;
+
+    /** Larghezza massima del campo per l'altezza del canvas, in pixel. */
     private static final int HEIGHTFIELD_WIDTH = 190;
+
+    /**
+     * Configura e visualizza la finestra principale dell'applicazione.
+     * 
+     * @param primaryStage finestra principale dell'applicazione JavaFX.
+     */
     @Override
-    //Imposto lo stage (ovverosia la finestra principale) dell'app e la chiamo primaryStage
     public void start(final Stage primaryStage) {
-        //Vado poi a creare il layout della GUI
-        //Per iniziare, creo il BorderPane per organizzare i componenti della GUI
+        // Crea il layout generale della GUI.
         BorderPane borderPane = new BorderPane();
-        //All'interno della toolbar vado a creare e ad inserire i pulsanti che utilizzeremo
-        //Per la gestione del canvas e del frattale
+        // Crea i pulsanti delle operazioni e l'area di testo per il log.
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
+        // Crea il pannello di scorrimento per il canvas.
         ScrollPane sl = new ScrollPane();
+        // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
         applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
-        exportButton.setOnAction(e -> textArea.appendText("Non è possibile esportare il frattale.\n"));
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e-> textArea.appendText("Il frattale è gia nella posizione iniziale\n"));
+        // Crea i campi per il ridimensionamento del canvas.
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
         heightField.setAlignment(Pos.CENTER);
         TextField widthField = new TextField();
         widthField.setPromptText("Inserisci la larghezza del canvas...");
         widthField.setAlignment(Pos.CENTER);
+        // Crea le opzioni disponibili per il tipo di frattale e la palette.
         ObservableList<String> fractals =FXCollections.observableArrayList(
         "Mandelbrot", "Julia"
     );
+        ObservableList<String> palettes =FXCollections.observableArrayList(
+        "Grayscale", "Rainbow"
+    );
+        // Crea le ComboBox per la selezione delle opzioni.
         ComboBox<String> fractalType = new ComboBox<String>();
         fractalType.setItems(fractals);
         fractalType.setPromptText("Selezionare il frattale");
+        ComboBox<String> paletteType = new ComboBox<String>();
+        paletteType.setItems(palettes);
+        paletteType.setPromptText("Selezionare la palette");
+        // Crea la toolbar contenente le opzioni di configurazione.
         ToolBar fractalOptions = new ToolBar(
-            fractalType
+            fractalType,
+            paletteType
         );
         VBox configBox = new VBox(
             20.0,
@@ -71,17 +111,17 @@ public final class JFXFractalAppGUI extends Application {
         widthField.setMaxWidth(WIDTHFIELD_WIDTH);
         heightField.setMaxWidth(HEIGHTFIELD_WIDTH);
         configBox.setAlignment(Pos.CENTER);
-        //Creo la VBox contenenti i parametri per la gestione del frattale e il log
+        // Crea la VBox contenenti i parametri per la gestione del frattale e il log.
         VBox paramBox = new VBox(configBox, textArea);
         VBox.setVgrow(configBox, Priority.SOMETIMES);
         VBox.setVgrow(textArea, Priority.SOMETIMES);
-        //Creo il canvas sul quale verrà applicato il frattale, passandogli i valori
-        //Definiti alla creazione dell'App
-        Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        // Crea il canvas con le dimensioni iniziali definite nelle costanti.
+        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+        exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.BLUE);
-        gc.fillRect(0, 0, CANVAS_WIDTH,CANVAS_HEIGHT);
+        gc.fillRect(0, 0, canvasWidth, canvasHeight);
         borderPane.setRight(paramBox);
         borderPane.setBottom(fractalOptions);
         borderPane.setCenter(sl);     
@@ -117,6 +157,47 @@ public final class JFXFractalAppGUI extends Application {
             // JavaFXApp.launch(args);
             // Whereas the following would do just fine:
             // JavaFXApp.run(args)
+        }
+    }
+
+    /**
+     * Esegue l'exportButton per esportare il canvas in un immagine formato PNG.
+     * @param canvas Canvas contenente il frattale
+     * @param textArea Messaggio stampato nella textArea a seconda dell'esito
+     * @param primaryStage Finestra della GUI 
+     */
+    private void handleExport(Canvas canvas, TextArea textArea, Stage primaryStage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("fractal.png");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file == null) {
+            return;
+        }
+
+        // Esporta immagine visualizzata
+        WritableImage image = new WritableImage(
+            (int) canvas.getWidth(),
+            (int) canvas.getHeight()
+        );
+
+        canvas.snapshot(null, image);
+
+        try 
+        {
+            ImageIO.write
+            (
+                SwingFXUtils.fromFXImage(image, null),
+                "png",
+                file
+            );
+            textArea.appendText("Frattale esportato correttamente.\n");
+        } 
+        
+        catch (IOException ex) 
+        {
+            textArea.appendText("Errore durante l'esportazione: " + ex + "\n");
+            ex.printStackTrace();
         }
     }
 }
