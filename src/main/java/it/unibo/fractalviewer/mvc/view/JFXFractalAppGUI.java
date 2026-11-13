@@ -4,6 +4,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import it.unibo.fractalviewer.mvc.model.ColorPalette;
+import it.unibo.fractalviewer.mvc.model.FractalCalculator;
+import it.unibo.fractalviewer.mvc.model.GrayscalePalette;
+import it.unibo.fractalviewer.mvc.model.MandelbrotCalculator;
+import it.unibo.fractalviewer.mvc.model.RainbowPalette;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,6 +68,8 @@ public final class JFXFractalAppGUI extends Application {
     public void start(final Stage primaryStage) {
         // Crea il layout generale della GUI.
         BorderPane borderPane = new BorderPane();
+        // Crea il canvas con le dimensioni iniziali definite nelle costanti.
+        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
         // Crea i pulsanti delle operazioni e l'area di testo per il log.
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
@@ -82,19 +89,60 @@ public final class JFXFractalAppGUI extends Application {
         widthField.setPromptText("Inserisci la larghezza del canvas...");
         widthField.setAlignment(Pos.CENTER);
         // Crea le opzioni disponibili per il tipo di frattale e la palette.
-        ObservableList<String> fractals =FXCollections.observableArrayList(
-        "Mandelbrot", "Julia"
-    );
-        ObservableList<String> palettes =FXCollections.observableArrayList(
-        "Grayscale", "Rainbow"
-    );
+        ObservableList<String> fractals =FXCollections.observableArrayList
+        (
+            "Mandelbrot", "Julia"
+        );
+        ObservableList<ColorPalette> palettes =FXCollections.observableArrayList
+        (
+            new GrayscalePalette(),
+            new RainbowPalette()
+        );
         // Crea le ComboBox per la selezione delle opzioni.
         ComboBox<String> fractalType = new ComboBox<String>();
         fractalType.setItems(fractals);
         fractalType.setPromptText("Selezionare il frattale");
-        ComboBox<String> paletteType = new ComboBox<String>();
+        ComboBox<ColorPalette> paletteType = new ComboBox<ColorPalette>();
         paletteType.setItems(palettes);
         paletteType.setPromptText("Selezionare la palette");
+        // Mostra il nome della palette dall'elenco a tendina.
+        paletteType.setCellFactory(
+            list -> new javafx.scene.control.ListCell<>()
+            {
+                @Override 
+                protected void updateItem(ColorPalette palette, boolean empty)
+                {
+                    super.updateItem(palette, empty);
+                    setText(empty || palette == null ? null : palette.getName());
+                }
+            }
+        );
+        // Mostra il nome della palette anche quando è selezionata.
+        paletteType.setButtonCell(
+            new javafx.scene.control.ListCell<>() 
+            {
+                @Override 
+                protected void updateItem(ColorPalette palette, boolean empty)
+                {
+                    super.updateItem(palette, empty);
+                    setText(empty || palette == null ? null : palette.getName());
+                }
+            }
+        );
+        // Ogni volta che è selezionata una palette, viene chiamato il metodo per 
+        // ridisegnare il frattale.
+        paletteType.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldPalette, newPalette) -> {
+                if (newPalette != null )
+                {
+                    renderFractal(canvas, newPalette);
+                    textArea.appendText(
+                        "Palette selezionata" + newPalette.getName() + "\n"
+                    );
+                }
+            }
+        );
+        paletteType.getSelectionModel().selectFirst();
         // Crea la toolbar contenente le opzioni di configurazione.
         ToolBar fractalOptions = new ToolBar(
             fractalType,
@@ -115,8 +163,7 @@ public final class JFXFractalAppGUI extends Application {
         VBox paramBox = new VBox(configBox, textArea);
         VBox.setVgrow(configBox, Priority.SOMETIMES);
         VBox.setVgrow(textArea, Priority.SOMETIMES);
-        // Crea il canvas con le dimensioni iniziali definite nelle costanti.
-        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+        // Configura il canvas e il comportamento dell'exportButton.
         exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -198,6 +245,42 @@ public final class JFXFractalAppGUI extends Application {
         {
             textArea.appendText("Errore durante l'esportazione: " + ex + "\n");
             ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Renderizza il frattale per applicare la palette selezionata.
+     * @param calculator Algoritmo utilizzato per calcolare il frattale.
+     * @param canvas Canvas contenente il frattale.
+     * @param palette Palette selezionata.
+     */
+    private void renderFractal(FractalCalculator calculator, Canvas canvas, ColorPalette palette) {
+        // Recupera il contesto grafico necessario per disegnare sul canvas.
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        
+        // Definisce il numero massimo di iterazioni per punto.
+        int maxIterations = 500;
+        // Definisce i limiti delle componenti reali e immaginarie del piano complesso.
+        double minReal = -2.5;
+        double maxReal = 1.0;
+        double minImaginary = -1.0;
+        double maxImaginary = 1.0;
+
+        // Scorre tutte le colonne e le righe del canvas.
+        for (int x = 0; x < canvas.getWidth(); x++) {
+            for (int y = 0; y < canvas.getHeight(); y++)
+            {
+                // Conversione delle coordinate pixel in coordinate complesse.
+                double real = minReal + x * (maxReal - minReal) / canvas.getWidth();
+                double imaginary = maxImaginary - y * (maxImaginary - minImaginary) / canvas.getWidth();
+                // Calcolo delle iterazioni.
+                int iterations = calculator.calculate(real, imaginary, maxIterations);
+                // Determinazione del colore.
+                Color color = palette.colorFor(iterations, maxIterations);
+                // Disegno del pixel.
+                gc.setFill(color);
+                gc.fillRect(x, y, 1, 1);
+            }
         }
     }
 }
