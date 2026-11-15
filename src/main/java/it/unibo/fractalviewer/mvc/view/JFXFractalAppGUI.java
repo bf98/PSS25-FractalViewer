@@ -36,10 +36,10 @@ import javafx.stage.Stage;
  */
 public final class JFXFractalAppGUI extends Application {
     /** Larghezza iniziale del canvas, in pixel. */
-    private static final int BASE_CANVAS_WIDTH = 800;
+    private static final int BASE_CANVAS_WIDTH = 640;
 
     /** Altezza iniziale del canvas, in pixel. */
-    private static final int BASE_CANVAS_HEIGHT = 600;
+    private static final int BASE_CANVAS_HEIGHT = 480;
 
     /** Larghezza variabile del canvas, in pixel. */
     private int canvasWidth = BASE_CANVAS_WIDTH;
@@ -137,7 +137,7 @@ public final class JFXFractalAppGUI extends Application {
                 {
                     renderFractal(canvas, newPalette);
                     textArea.appendText(
-                        "Palette selezionata" + newPalette.getName() + "\n"
+                        "Palette selezionata " + newPalette.getName() + "\n"
                     );
                 }
             }
@@ -254,7 +254,7 @@ public final class JFXFractalAppGUI extends Application {
      * @param canvas Canvas contenente il frattale.
      * @param palette Palette selezionata.
      */
-    private void renderFractal(FractalCalculator calculator, Canvas canvas, ColorPalette palette) {
+    private void renderFractal(Canvas canvas, ColorPalette palette) {
         // Recupera il contesto grafico necessario per disegnare sul canvas.
         GraphicsContext gc = canvas.getGraphicsContext2D();
         
@@ -265,6 +265,8 @@ public final class JFXFractalAppGUI extends Application {
         double maxReal = 1.0;
         double minImaginary = -1.0;
         double maxImaginary = 1.0;
+
+        MandelbrotCalculator calculator = new MandelbrotCalculator();
 
         // Scorre tutte le colonne e le righe del canvas.
         for (int x = 0; x < canvas.getWidth(); x++) {

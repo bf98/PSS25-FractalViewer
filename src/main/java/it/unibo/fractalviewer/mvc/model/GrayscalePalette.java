@@ -1,25 +1,21 @@
 package it.unibo.fractalviewer.mvc.model;
 
-import javafx.scene.paint.Color;
-
-public class GrayscalePalette extends ColorPalette {
-
-    @Override
-    public Color colorFor(int iterations, int maxIterations) {
-        if (iterations >= maxIterations) {
-            return Color.BLACK;
-        }
-        double brightness = (double) iterations / maxIterations;
-        return Color.gray(brightness);
+/**
+ * Implementa una palette in scala di grigi.
+ */
+public final class GrayscalePalette implements ColorPalette {
+  @Override
+  public int colorFor(final int iterations, final int maxIterations) {
+    if (iterations >= maxIterations) {
+      return 0xFF000000;
     }
+    int gray = (int) (255.0 * iterations / maxIterations);
+    
+    return 0xFF000000 | (gray << 16) | (gray << 8) | gray;
+  }
 
-    @Override
-    public ColorPalette copy() {
-        return new GrayscalePalette();
-    }
-
-    @Override
-    public String getName() {
-        return "Grayscale";
-    }
+  @Override
+  public String getName() {
+    return "Grayscale";
+  }
 }

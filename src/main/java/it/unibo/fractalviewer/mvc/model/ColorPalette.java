@@ -1,19 +1,15 @@
 package it.unibo.fractalviewer.mvc.model;
 
-import javafx.scene.paint.Color;
-
-public abstract class ColorPalette {
-
-    /**
-     * Restituisce il colore di un punto.
-     *
-     * @param iterations iterazioni eseguite
-     * @param maxIterations limite massimo iterazioni
-     * @return colore punto
-     */
-    public abstract Color colorFor(int iterations, int maxIterations);
-
-    public abstract ColorPalette copy();
-
-    public abstract String getName();
+/**
+*  Definisce il comportamento comune delle palette di colore.
+*/
+public interface ColorPalette {
+  /**
+  *  Restituisce il colore ARGB associato a un punto.
+  *  @param iterations Le iterazioni eseguite.
+  *  @param maxIterations Il limite massimo di iterazioni.
+  *  @return Il colore del punto in formato ARGB.
+  */
+  int colorFor(int iterations, int maxIterations);
+  String getName();
 }
