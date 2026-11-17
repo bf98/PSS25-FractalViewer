@@ -278,10 +278,12 @@ public final class JFXFractalAppGUI extends Application {
                 // Calcolo delle iterazioni.
                 int iterations = calculator.calculate(real, imaginary, maxIterations);
                 // Determinazione del colore.
-                Color color = palette.colorFor(iterations, maxIterations);
-                // Disegno del pixel.
-                gc.setFill(color);
-                gc.fillRect(x, y, 1, 1);
+                /**
+                 * Color color = palette.colorFor(iterations, maxIterations);
+                 * // Disegno del pixel.
+                 * gc.setFill(color);
+                 * gc.fillRect(x, y, 1, 1);
+                 */
             }
         }
     }
