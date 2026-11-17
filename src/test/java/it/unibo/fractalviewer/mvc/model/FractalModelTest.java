@@ -65,6 +65,24 @@ class FractalModelTest {
 	}
 
 	/**
+	 * Verifica che la palette iniziale sia in scala di grigi.
+	 */
+	@Test
+	void testDefaultPalette() {
+		assertInstanceOf(GrayscalePalette.class, model.getPalette());
+	}
+
+	/**
+	 * Verifica l'aggiornamento della palette.
+	 */
+	@Test
+	void testSetPalette() {
+		ColorPalette palette = new RainbowPalette();
+		model.setPalette(palette);
+		assertSame(palette, model.getPalette());
+	}
+
+	/**
 	 * Verifica che i parametri non validi vengano rifiutati.
 	 */
 	@Test
@@ -108,5 +126,11 @@ class FractalModelTest {
 									() -> model.setMaxIterations(-10));
 
 		assertEquals(100, model.getMaxIterations());
+
+		// Verifica palette non valida.
+		assertThrows(NullPointerException.class,
+									() -> model.setPalette(null));
+
+		assertInstanceOf(GrayscalePalette.class, model.getPalette());
 	}
 }
