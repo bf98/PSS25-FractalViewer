@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import it.unibo.fractalviewer.mvc.model.FractalModel;
 import it.unibo.fractalviewer.mvc.model.FractalRenderer;
+import it.unibo.fractalviewer.mvc.model.ColorPalette;
 
 /**
  * Coordina la gestione dello stato della visualizzazione (FractalModel)
@@ -38,7 +39,8 @@ public final class FractalController {
 			model.getCenterX(),
 			model.getCenterY(),
 			model.getScale(),
-			model.getMaxIterations()
+			model.getMaxIterations(),
+			model.getPalette()
 		);
 	}
 
@@ -78,5 +80,14 @@ public final class FractalController {
 	 */
 	public void setMaxIterations(final int maxIterations) {
 		model.setMaxIterations(maxIterations);
+	}
+
+	/**
+	 * Aggiorna la palette della visualizzazione.
+	 *
+	 * @param palette La nuova palette.
+	 */
+	public void setPalette(final ColorPalette palette) {
+		model.setPalette(palette);
 	}
 }
