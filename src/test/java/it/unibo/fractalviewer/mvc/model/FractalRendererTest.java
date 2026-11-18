@@ -16,13 +16,14 @@ class FractalRendererTest {
 	// Mandelbrot, Julia etc (vedi: "test double", "test stub").
 	private final FractalCalculator calculator = (real, imaginary, maxIterations) -> 5;
 	private final FractalRenderer renderer = new FractalRenderer(calculator);
+	private final ColorPalette palette = new GrayscalePalette();
 
 	/**
 	 * Verifica che il renderer generi il numero corretto di pixel.
 	 */
 	@Test
 	void testImageDimensions() {
-		int[] pixels = renderer.render(200, 100, -0.5, 0.0, 0.005,100);
+		int[] pixels = renderer.render(200, 100, -0.5, 0.0, 0.005, 100, palette);
 		assertEquals(20_000, pixels.length);
 	}
 
@@ -32,11 +33,11 @@ class FractalRendererTest {
 	@Test
 	void testInvalidResolution() {
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(0, 600, 0, 0, 0.005, 100));
+								 () -> renderer.render(0, 600, 0, 0, 0.005, 100, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(800, -600, 0, 0, 0.005, 100));
+								 () -> renderer.render(800, -600, 0, 0, 0.005, 100, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(5000, 5000, 0, 0, 0.005, 100));
+								 () -> renderer.render(5000, 5000, 0, 0, 0.005, 100, palette));
 	}
 
 	/**
@@ -46,15 +47,15 @@ class FractalRendererTest {
 	@Test
 	void testInvalidParameters() {
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, 0, 100));
+								 () -> renderer.render(10, 10, 0, 0, 0, 100, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, -1, 100));
+								 () -> renderer.render(10, 10, 0, 0, -1, 100, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, 1, 0));
+								 () -> renderer.render(10, 10, 0, 0, 1, 0, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, Double.NaN, 0, 1, 100));
+								 () -> renderer.render(10, 10, Double.NaN, 0, 1, 100, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, Double.POSITIVE_INFINITY, 1, 100));
+								 () -> renderer.render(10, 10, 0, Double.POSITIVE_INFINITY, 1, 100, palette));
 	}
 
 	/**
@@ -88,7 +89,7 @@ class FractalRendererTest {
 		};
 
 		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
-		testRenderer.render(2, 2, 0, 0, 1, 100);
+		testRenderer.render(2, 2, 0, 0, 1, 100, palette);
 
 		assertEquals(4, index[0]);
 	}
@@ -104,7 +105,7 @@ class FractalRendererTest {
 																				(int) (real + 1);
 		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
 
-		int[] pixels = testRenderer.render(2, 1, 0, 0, 1, 100);
+		int[] pixels = testRenderer.render(2, 1, 0, 0, 1, 100, palette);
 
 		// Secondo la formula per calcolare la tonalità di grigio:
 		// 255 * 0 / 100 == 0
@@ -134,7 +135,7 @@ class FractalRendererTest {
 
 		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
 
-		int[] pixels = testRenderer.render(2, 2, 0, 0, 1, 100);
+		int[] pixels = testRenderer.render(2, 2, 0, 0, 1, 100, palette);
 
 		assertEquals(4, calls[0]);
 
@@ -145,35 +146,40 @@ class FractalRendererTest {
 	}
 
 	/**
-	 * Verifica che i punti che raggiungono il limite
-	 * massimo in iterazioni siano rappresentati in nero.
+	 * Verifica che il renderer utilizzi la palette ricevuta
+	 * per determinare il colore dei pixel.
 	 */
 	@Test
-	void testInternalPointColor() {
-		FractalRenderer testRenderer = new FractalRenderer((real, imaginary, maxIterations)
-																												-> maxIterations);
-		int[] pixels = testRenderer.render(2, 2, 0, 0, 1, 100);
+	void testColorPalette() {
+		// Istanziamo una palette fittizia che restituisce sempre lo stesso colore.
+		ColorPalette palette = new ColorPalette() {
+			@Override
+			public int colorFor(final int iterations, final int maxIterations) {
+				return 0xFFFF0000;
+			}
 
-		// Il calculator restituisce sempre maxIterations, quindi tutti i pixel devono essere neri.
+			@Override
+			public String getName() {
+				return "Palette";
+			}
+		};
+
+		int[] pixels = renderer.render(2, 2, 0.0, 0.0, 1.0, 100, palette);
+
 		for (int pixel : pixels) {
-			assertEquals(0xFF000000, pixel);
+			assertEquals(0xFFFF0000, pixel);
 		}
 	}
 
 	/**
-	 * Verifica che il renderer produca correttamente
-	 * una tonalità intermedia di grigio.
+	 * Verifica che il renderer rifiuti una palette nulla.
 	 */
 	@Test
-	void testGrayscaleColor() {
-		FractalRenderer testRenderer = new FractalRenderer((real, imaginary, maxIterations)
-																												-> 50);
-		int[] pixels = testRenderer.render(2, 2, 0, 0, 1, 100);
-		
-		// 255 * 50 / 100 == 127 (7F)
-		for (int pixel : pixels) {
-			assertEquals(0xFF7F7F7F, pixel);
-		}
+	void testNullPalette() {
+		assertThrows(NullPointerException.class,
+									() -> renderer.render(
+												2, 2, 0.0, 0.0, 1.0, 100, null
+									));
 	}
 
 	/**
