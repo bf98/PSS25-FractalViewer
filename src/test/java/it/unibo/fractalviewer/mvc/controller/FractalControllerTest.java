@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import it.unibo.fractalviewer.mvc.model.FractalCalculator;
 import it.unibo.fractalviewer.mvc.model.FractalModel;
 import it.unibo.fractalviewer.mvc.model.FractalRenderer;
+import it.unibo.fractalviewer.mvc.model.ColorPalette;
+import it.unibo.fractalviewer.mvc.model.RainbowPalette;
 
 /**
  * Test della classe FractalController.
@@ -52,6 +54,34 @@ class FractalControllerTest {
 	}
 
 	/**
+	 * Verifica che il renderer utilizzi la palette corrente del FractalModel.
+	 */
+	@Test
+	void testRenderPalette() {
+		controller.setResolution(2, 2);
+		
+		controller.setPalette(
+					new ColorPalette() {
+						@Override
+						public int colorFor(final int iterations, final int maxIterations) {
+							return 0xFFFF0000;
+						}
+
+						@Override
+						public String getName() {
+							return "Palette";
+						}
+					}
+				);
+
+		int[] pixels = controller.render();
+
+		for (int pixel : pixels) {
+			assertEquals(0xFFFF0000, pixel);
+		}
+	}
+
+	/**
 	 * Verifica l'aggiornamento della risoluzione.
 	 */
 	@Test
@@ -94,6 +124,16 @@ class FractalControllerTest {
 		controller.setMaxIterations(500);
 
 		assertEquals(500, model.getMaxIterations());
+	}
+
+	/**
+	 * Verifica l'aggiornamento della palette attraverso il FractalController.
+	 */
+	@Test
+	void testSetPalette() {
+		ColorPalette palette = new RainbowPalette();
+		controller.setPalette(palette);
+		assertSame(palette, model.getPalette());
 	}
 
 	/**
