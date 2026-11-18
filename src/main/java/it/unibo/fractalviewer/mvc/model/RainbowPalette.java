@@ -1,25 +1,21 @@
 package it.unibo.fractalviewer.mvc.model;
 
-import javafx.scene.paint.Color;
+// Necessario per conversione HSB to RGB.
+import java.awt.Color;
 
-public class RainbowPalette extends ColorPalette {
-
-    @Override
-    public Color colorFor(int iterations, int maxIterations) {
-        if (iterations >= maxIterations) {
-            return Color.BLACK;
-        }
-        double hue = 360.0 * ((double) iterations / maxIterations);
-        return Color.hsb(hue, 0.8, 1.0);
+public final class RainbowPalette implements ColorPalette {
+  @Override
+  public int colorFor(final int iterations, final int maxIterations) {
+    if (iterations >= maxIterations) {
+      return 0xFF000000;
     }
+    float hue = (float) iterations / maxIterations;
 
-    @Override
-    public ColorPalette copy() {
-        return new RainbowPalette();
-    }
+    return Color.HSBtoRGB(hue, 0.8f, 1.0f);
+  }
 
-    @Override
-    public String getName() {
-        return "Rainbow";
-    }
+  @Override
+  public String getName() {
+     return "Rainbow";
+  }
 }

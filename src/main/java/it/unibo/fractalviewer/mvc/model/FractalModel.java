@@ -1,5 +1,7 @@
 package it.unibo.fractalviewer.mvc.model;
 
+import java.util.Objects;
+
 /**
  * Conserva i parametri della visualizzazione corrente del frattale
  * (risoluzione dell'immagine, centro nel piano complesso, scala,
@@ -15,6 +17,8 @@ public final class FractalModel {
 	private double scale = 0.005;
 
 	private int maxIterations = 100;
+
+	private ColorPalette palette = new GrayscalePalette();
 
 	private static final long MAX_PIXELS = 10_000_000L;
 
@@ -71,6 +75,16 @@ public final class FractalModel {
 		this.maxIterations = maxIterations;
 	}
 
+	/**
+	 * Aggiorna la palette utilizzata per la visualizzazione.
+	 *
+	 * @param palette La nuova palette di colori.
+	 * @throws NullPointerException Se la palette è NULL.
+	 */
+	public void setPalette(final ColorPalette palette) {
+		this.palette = Objects.requireNonNull(palette);
+	}
+
 	public int getWidth() {
 		return this.width;
 	}
@@ -93,5 +107,9 @@ public final class FractalModel {
 
 	public int getMaxIterations() {
 		return this.maxIterations;
+	}
+
+	public ColorPalette getPalette() {
+		return this.palette;
 	}
 }
