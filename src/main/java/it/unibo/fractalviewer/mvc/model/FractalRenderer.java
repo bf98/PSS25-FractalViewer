@@ -36,15 +36,25 @@ public final class FractalRenderer {
 	 * @param centerY La coordinata immaginare del centro.
 	 * @param scale L'unità del piano complesso per pixel.
 	 * @param maxIterations Il numero massimo di iterazioni consentite.
+	 * @param palette La palette di colori da utilizzare.
 	 * @return L'array contenente i colori ARGB dei pixel.
+	 * @throws NullPointerException Se la palette è NULL.
 	 * @throws IllegalArgumentException Se i parametri non sono validi.
 	 */
-	public int[] render(final int width, final int height, final double centerX, final double centerY, final double scale, final int maxIterations) {
+	public int[] render(final int width, 
+											final int height, 
+											final double centerX, 
+											final double centerY, 
+											final double scale, 
+											final int maxIterations,
+											final ColorPalette palette) {
 
 		if (width <= 0 || height <= 0|| (long) width * height > MAX_PIXELS || !Double.isFinite(centerX)
 				|| !Double.isFinite(centerY) || !Double.isFinite(scale) || scale <= 0 || maxIterations <= 0) {
 					throw new IllegalArgumentException("Parametri di rendering non validi.");
-				}
+		}
+
+		Objects.requireNonNull(palette, "La palette non può essere NULL.");
 		
 		int[] pixels = new int[width * height];
 
@@ -55,24 +65,7 @@ public final class FractalRenderer {
 
 				int iterations = calculator.calculate(real, imaginary, maxIterations);
 
-				// Tutto questo verrà poi sostituito con palette di colore.
-				int color;
-
-				if (iterations >= maxIterations) {
-					// Rappresenta in nero i punti che raggiungo il limite.
-					// Il byte più significativo (FF) rappresenta l'opacità del colore.
-					// Seguono poi i byte per Red, Green, Blue.
-					color = 0xFF000000;
-				} else {
-					// Calcola l'intensità del grigio in funzione delle iterazioni.
-					int gray = (int) (255.0 * iterations / maxIterations);
-
-					// "Compone" il colore ARGB finale, utilizzando
-					// la stessa intensità per i canali rosso, verde e blu, con opacità massima.
-					color = 0xFF000000 | (gray << 16) | (gray << 8) | gray;
-				}
-
-				pixels[y * width + x] = color;
+				pixels[y * width + x] = palette.colorFor(iterations, maxIterations);
 			}
 		}
 
