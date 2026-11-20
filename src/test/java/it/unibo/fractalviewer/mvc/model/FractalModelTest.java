@@ -73,6 +73,16 @@ class FractalModelTest {
 	}
 
 	/**
+	 * Verifica l'aggiornamento del Calculator.
+	 */
+	@Test
+	void testSetCalculator() {
+		FractalCalculator calculator = new JuliaCalculator();
+		model.setCalculator(calculator);
+		assertSame(calculator, model.getCalculator());
+	}
+
+	/**
 	 * Verifica l'aggiornamento della palette.
 	 */
 	@Test
