@@ -3,6 +3,7 @@ package it.unibo.fractalviewer.mvc.controller;
 import java.util.Objects;
 
 import it.unibo.fractalviewer.mvc.model.FractalModel;
+import it.unibo.fractalviewer.mvc.model.FractalCalculator;
 import it.unibo.fractalviewer.mvc.model.FractalRenderer;
 import it.unibo.fractalviewer.mvc.model.ColorPalette;
 
@@ -40,6 +41,7 @@ public final class FractalController {
 			model.getCenterY(),
 			model.getScale(),
 			model.getMaxIterations(),
+			model.getCalculator(),
 			model.getPalette()
 		);
 	}
@@ -80,6 +82,16 @@ public final class FractalController {
 	 */
 	public void setMaxIterations(final int maxIterations) {
 		model.setMaxIterations(maxIterations);
+	}
+
+	/**
+	 * Aggiorna il FractalCalculator utilizzato nella visualizzazione, 
+	 * quindi la tipologia di frattale mostrata.
+	 *
+	 * @param calculator Il nuovo Calculator.
+	 */
+	public void setCalculator(final FractalCalculator calculator) {
+		model.setCalculator(calculator);
 	}
 
 	/**
