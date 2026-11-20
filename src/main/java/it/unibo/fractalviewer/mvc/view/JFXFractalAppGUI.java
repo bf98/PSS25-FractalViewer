@@ -14,7 +14,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
@@ -25,7 +24,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.image.PixelWriter;
@@ -68,7 +66,7 @@ public final class JFXFractalAppGUI extends Application {
 				// Inizializza i componenti per la gestione e rendering del frattale.
 				FractalModel model = new FractalModel();
 				model.setResolution(canvasWidth, canvasHeight);
-				FractalRenderer renderer = new FractalRenderer(new MandelbrotCalculator());
+				FractalRenderer renderer = new FractalRenderer();
 				FractalController controller = new FractalController(model, renderer);
         // Crea il layout generale della GUI.
         BorderPane borderPane = new BorderPane();
