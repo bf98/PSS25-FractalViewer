@@ -15,18 +15,6 @@ public final class FractalRenderer {
 
 	private static final long MAX_PIXELS = 10_000_000L;
 
-	private final FractalCalculator calculator;
-
-	/** 
-	 * Crea un renderer utilizzando il calcolatore (i.e. algoritmo) specificato.
-	 *
-	 * @param calculator L'algoritmo utilizzato per il calcolo.
-	 * @throws NullPointerException Se calculator è NULL.
-	 */
-	public FractalRenderer(final FractalCalculator calculator) {
-		this.calculator = Objects.requireNonNull(calculator);
-	}
-
 	/**
 	 * Genera un'immagine del frattale, in formato ARGB. 
 	 *
@@ -47,6 +35,7 @@ public final class FractalRenderer {
 											final double centerY, 
 											final double scale, 
 											final int maxIterations,
+											final FractalCalculator calculator,
 											final ColorPalette palette) {
 
 		if (width <= 0 || height <= 0|| (long) width * height > MAX_PIXELS || !Double.isFinite(centerX)
@@ -55,6 +44,7 @@ public final class FractalRenderer {
 		}
 
 		Objects.requireNonNull(palette, "La palette non può essere NULL.");
+		Objects.requireNonNull(calculator, "Il Calculator non può essere NULL.");
 		
 		int[] pixels = new int[width * height];
 
