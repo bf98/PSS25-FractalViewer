@@ -4,11 +4,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import it.unibo.fractalviewer.mvc.model.ColorPalette;
-import it.unibo.fractalviewer.mvc.model.FractalCalculator;
-import it.unibo.fractalviewer.mvc.model.GrayscalePalette;
-import it.unibo.fractalviewer.mvc.model.MandelbrotCalculator;
-import it.unibo.fractalviewer.mvc.model.RainbowPalette;
+import it.unibo.fractalviewer.mvc.model.*;
+import it.unibo.fractalviewer.mvc.controller.*;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,6 +28,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.image.PixelWriter;
 
 /**
  * Implementa la GUI dell'applicazione FractalViewer utilizzando JavaFX.
@@ -66,6 +65,11 @@ public final class JFXFractalAppGUI extends Application {
      */
     @Override
     public void start(final Stage primaryStage) {
+				// Inizializza i componenti per la gestione e rendering del frattale.
+				FractalModel model = new FractalModel();
+				model.setResolution(canvasWidth, canvasHeight);
+				FractalRenderer renderer = new FractalRenderer(new MandelbrotCalculator());
+				FractalController controller = new FractalController(model, renderer);
         // Crea il layout generale della GUI.
         BorderPane borderPane = new BorderPane();
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
@@ -135,7 +139,8 @@ public final class JFXFractalAppGUI extends Application {
             (observable, oldPalette, newPalette) -> {
                 if (newPalette != null )
                 {
-                    renderFractal(canvas, newPalette);
+										controller.setPalette(newPalette);
+										renderFractal(canvas, controller.render());
                     textArea.appendText(
                         "Palette selezionata " + newPalette.getName() + "\n"
                     );
@@ -166,9 +171,6 @@ public final class JFXFractalAppGUI extends Application {
         // Configura il canvas e il comportamento dell'exportButton.
         exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLUE);
-        gc.fillRect(0, 0, canvasWidth, canvasHeight);
         borderPane.setRight(paramBox);
         borderPane.setBottom(fractalOptions);
         borderPane.setCenter(sl);     
@@ -178,6 +180,7 @@ public final class JFXFractalAppGUI extends Application {
         primaryStage.setMinWidth(700);
         primaryStage.setMinHeight(500);
         primaryStage.setResizable(true);
+				renderFractal(canvas, controller.render());
         primaryStage.show();
     }
 
@@ -254,37 +257,16 @@ public final class JFXFractalAppGUI extends Application {
      * @param canvas Canvas contenente il frattale.
      * @param palette Palette selezionata.
      */
-    private void renderFractal(Canvas canvas, ColorPalette palette) {
-        // Recupera il contesto grafico necessario per disegnare sul canvas.
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        
-        // Definisce il numero massimo di iterazioni per punto.
-        int maxIterations = 500;
-        // Definisce i limiti delle componenti reali e immaginarie del piano complesso.
-        double minReal = -2.5;
-        double maxReal = 1.0;
-        double minImaginary = -1.0;
-        double maxImaginary = 1.0;
+    private void renderFractal(Canvas canvas, final int[] pixels) {
+			PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
 
-        MandelbrotCalculator calculator = new MandelbrotCalculator();
+			int width = (int) canvas.getWidth();
+			int height = (int) canvas.getHeight();
 
-        // Scorre tutte le colonne e le righe del canvas.
-        for (int x = 0; x < canvas.getWidth(); x++) {
-            for (int y = 0; y < canvas.getHeight(); y++)
-            {
-                // Conversione delle coordinate pixel in coordinate complesse.
-                double real = minReal + x * (maxReal - minReal) / canvas.getWidth();
-                double imaginary = maxImaginary - y * (maxImaginary - minImaginary) / canvas.getWidth();
-                // Calcolo delle iterazioni.
-                int iterations = calculator.calculate(real, imaginary, maxIterations);
-                // Determinazione del colore.
-                /**
-                 * Color color = palette.colorFor(iterations, maxIterations);
-                 * // Disegno del pixel.
-                 * gc.setFill(color);
-                 * gc.fillRect(x, y, 1, 1);
-                 */
-            }
-        }
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					writer.setArgb(x, y, pixels[y * width + x]);
+				}
+			}
     }
 }
