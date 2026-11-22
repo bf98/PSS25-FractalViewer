@@ -14,6 +14,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
@@ -24,6 +25,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.image.PixelWriter;
@@ -79,49 +81,17 @@ public final class JFXFractalAppGUI extends Application {
         // Crea il pannello di scorrimento per il canvas.
         ScrollPane sl = new ScrollPane();
         // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
+        applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e-> textArea.appendText("Il frattale è gia nella posizione iniziale\n"));
         // Crea i campi per il ridimensionamento del canvas.
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
-        heightField.setText(String.valueOf(canvasHeight));
         heightField.setAlignment(Pos.CENTER);
         TextField widthField = new TextField();
         widthField.setPromptText("Inserisci la larghezza del canvas...");
-        widthField.setText(String.valueOf(canvasWidth));
         widthField.setAlignment(Pos.CENTER);
-        // Applica il ridimensionamento del canvas.
-        applyButton.setOnAction(e -> {
-            try 
-            {
-                // Legge il testo dai campi e lo converte da Stringa a numero intero (int).
-                int newWidth = Integer.parseInt(widthField.getText());
-                int newHeight = Integer.parseInt(heightField.getText());
-                // Controlla che le dimensioni siano positive.
-                if (newWidth <= 0 || newHeight <= 0)
-                {
-                    textArea.appendText("Le dimensioni devono essere maggiori di zero.\n");
-                    return;
-                }
-                // Aggiorna le variabili di stato della classe con quelle introdotte.
-                canvasWidth = newWidth;
-                canvasHeight = newHeight;
-                // Ridimensiona fisicamente il canvas nella GUI.
-                canvas.setWidth(canvasWidth);
-                canvas.setHeight(canvasHeight);
-                // Aggiorna la risoluzione mediante la funzione setResolution di FractalController.
-                controller.setResolution(canvasWidth, canvasHeight);
-                // Richiede al Controller i dati renderizzati e li disegna sul canvas.
-                renderFractal(canvas, controller.render());
-                 textArea.appendText("Risoluzione applicata: " + canvasWidth + "x" + canvasHeight + "\n");
-            }
-            // Stampa un messaggio di errore nel caso in cui l'input non è un intero valido.
-            catch (NumberFormatException ex) {
-                textArea.appendText("Risoluzione non applicabile: inserire numeri interi validi.\n");
-            }
-            }
-        );
         // Crea le opzioni disponibili per il tipo di frattale e la palette.
         ObservableList<String> fractals =FXCollections.observableArrayList
         (
@@ -134,8 +104,37 @@ public final class JFXFractalAppGUI extends Application {
         );
         // Crea le ComboBox per la selezione delle opzioni.
         ComboBox<String> fractalType = new ComboBox<String>();
+        // Applichiamo la selezione del frattale all'interno della ComboBox.
         fractalType.setItems(fractals);
-        fractalType.setPromptText("Selezionare il frattale");
+		fractalType.getSelectionModel().selectedItemProperty().addListener(
+			(observable, oldFractal, newFractal) -> {
+				if (newFractal != null) {
+					switch (newFractal) {
+						    case "Mandelbrot":
+						        controller.setCalculator(new MandelbrotCalculator());
+						        break;
+					        case "Julia":
+						        controller.setCalculator(new JuliaCalculator());
+						        break;
+						    default:
+						        return;
+					    }
+					    renderFractal(canvas, controller.render());
+				    }
+			}
+		);
+        // Stampa il nome del frattale quando è selezionato mediante un ascoltatore.
+        fractalType.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldFractal, newFractal) -> {
+                if (newFractal != null)
+                {
+                    textArea.appendText(
+                        "Frattale selezionato " + newFractal + "\n"
+                    );
+                }
+            }
+        );
+        fractalType.getSelectionModel().selectFirst();
         ComboBox<ColorPalette> paletteType = new ComboBox<ColorPalette>();
         paletteType.setItems(palettes);
         paletteType.setPromptText("Selezionare la palette");
