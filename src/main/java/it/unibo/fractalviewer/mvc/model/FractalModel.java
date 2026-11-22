@@ -18,6 +18,7 @@ public final class FractalModel {
 
 	private int maxIterations = 100;
 
+	private FractalCalculator calculator = new MandelbrotCalculator();
 	private ColorPalette palette = new GrayscalePalette();
 
 	private static final long MAX_PIXELS = 10_000_000L;
@@ -76,6 +77,17 @@ public final class FractalModel {
 	}
 
 	/**
+	 * Aggiorna il FractalCalculator utilizzato nella visualizzazione, 
+	 * quindi la tipologia di frattale mostrata.
+	 *
+	 * @param calculator Il nuovo Calculator.
+	 * @throws NullPointerException Se il Calculator è NULL.
+	 */
+	public void setCalculator(final FractalCalculator calculator) {
+		this.calculator = Objects.requireNonNull(calculator);
+	}
+
+	/**
 	 * Aggiorna la palette utilizzata per la visualizzazione.
 	 *
 	 * @param palette La nuova palette di colori.
@@ -107,6 +119,10 @@ public final class FractalModel {
 
 	public int getMaxIterations() {
 		return this.maxIterations;
+	}
+
+	public FractalCalculator getCalculator() {
+		return this.calculator;
 	}
 
 	public ColorPalette getPalette() {

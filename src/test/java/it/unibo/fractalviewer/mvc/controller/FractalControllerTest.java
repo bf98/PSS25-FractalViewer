@@ -1,13 +1,10 @@
 package it.unibo.fractalviewer.mvc.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import it.unibo.fractalviewer.mvc.model.FractalCalculator;
-import it.unibo.fractalviewer.mvc.model.FractalModel;
-import it.unibo.fractalviewer.mvc.model.FractalRenderer;
-import it.unibo.fractalviewer.mvc.model.ColorPalette;
-import it.unibo.fractalviewer.mvc.model.RainbowPalette;
+import it.unibo.fractalviewer.mvc.model.*;
 
 /**
  * Test della classe FractalController.
@@ -22,8 +19,13 @@ class FractalControllerTest {
 	// Mandelbrot, Julia etc (vedi: "test double", "test stub").
 	private final FractalCalculator calculator = (real, imaginary, maxIterations) -> 5;
 	private final FractalModel model = new FractalModel();
-	private final FractalRenderer renderer = new FractalRenderer(calculator);
+	private final FractalRenderer renderer = new FractalRenderer();
 	private final FractalController controller = new FractalController(model, renderer);
+
+	@BeforeEach
+	void setup() {
+		model.setCalculator(calculator);
+	}
 
 	/**
 	 * Verifica che il costruttore rifiuti argomenti NULL.
@@ -134,6 +136,27 @@ class FractalControllerTest {
 		ColorPalette palette = new RainbowPalette();
 		controller.setPalette(palette);
 		assertSame(palette, model.getPalette());
+	}
+
+	/**
+	 * Verifica l'aggiornamento del Calculator attraverso il FractalController.
+	 */
+	@Test
+	void testSetCalculator() {
+		FractalCalculator calculator = new JuliaCalculator();
+		controller.setCalculator(calculator);
+		assertSame(calculator, model.getCalculator());
+	}
+
+	/**
+	 * Verifica che il FractalController rifiuti un Calculator nullo
+	 * senza sovrascrivere quello precedentemente impostato.
+	 */
+	@Test
+	void testNullCalculator() {
+		FractalCalculator prevCalculator = model.getCalculator();
+		assertThrows(NullPointerException.class, () -> controller.setCalculator(null));
+		assertSame(prevCalculator, model.getCalculator());
 	}
 
 	/**

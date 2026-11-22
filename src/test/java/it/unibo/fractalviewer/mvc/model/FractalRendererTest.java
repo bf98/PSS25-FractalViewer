@@ -15,7 +15,7 @@ class FractalRendererTest {
 	// il comportamento di FractalRenderer, escludendo così possibili casi speciali legati a 
 	// Mandelbrot, Julia etc (vedi: "test double", "test stub").
 	private final FractalCalculator calculator = (real, imaginary, maxIterations) -> 5;
-	private final FractalRenderer renderer = new FractalRenderer(calculator);
+	private final FractalRenderer renderer = new FractalRenderer();
 	private final ColorPalette palette = new GrayscalePalette();
 
 	/**
@@ -23,7 +23,7 @@ class FractalRendererTest {
 	 */
 	@Test
 	void testImageDimensions() {
-		int[] pixels = renderer.render(200, 100, -0.5, 0.0, 0.005, 100, palette);
+		int[] pixels = renderer.render(200, 100, -0.5, 0.0, 0.005, 100, calculator, palette);
 		assertEquals(20_000, pixels.length);
 	}
 
@@ -33,11 +33,11 @@ class FractalRendererTest {
 	@Test
 	void testInvalidResolution() {
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(0, 600, 0, 0, 0.005, 100, palette));
+								 () -> renderer.render(0, 600, 0, 0, 0.005, 100, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(800, -600, 0, 0, 0.005, 100, palette));
+								 () -> renderer.render(800, -600, 0, 0, 0.005, 100, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(5000, 5000, 0, 0, 0.005, 100, palette));
+								 () -> renderer.render(5000, 5000, 0, 0, 0.005, 100, calculator, palette));
 	}
 
 	/**
@@ -47,15 +47,15 @@ class FractalRendererTest {
 	@Test
 	void testInvalidParameters() {
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, 0, 100, palette));
+								 () -> renderer.render(10, 10, 0, 0, 0, 100, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, -1, 100, palette));
+								 () -> renderer.render(10, 10, 0, 0, -1, 100, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, 0, 1, 0, palette));
+								 () -> renderer.render(10, 10, 0, 0, 1, 0, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, Double.NaN, 0, 1, 100, palette));
+								 () -> renderer.render(10, 10, Double.NaN, 0, 1, 100, calculator, palette));
 		assertThrows(IllegalArgumentException.class, 
-								 () -> renderer.render(10, 10, 0, Double.POSITIVE_INFINITY, 1, 100, palette));
+								 () -> renderer.render(10, 10, 0, Double.POSITIVE_INFINITY, 1, 100, calculator, palette));
 	}
 
 	/**
@@ -88,8 +88,7 @@ class FractalRendererTest {
 			return 5;
 		};
 
-		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
-		testRenderer.render(2, 2, 0, 0, 1, 100, palette);
+		renderer.render(2, 2, 0, 0, 1, 100, testCalculator, palette);
 
 		assertEquals(4, index[0]);
 	}
@@ -103,9 +102,7 @@ class FractalRendererTest {
 		// La funzione lambda in questione ci permette di generare due pixel con colori differenti.
 		FractalCalculator testCalculator = (real, imaginary, maxIterations) ->
 																				(int) (real + 1);
-		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
-
-		int[] pixels = testRenderer.render(2, 1, 0, 0, 1, 100, palette);
+		int[] pixels = renderer.render(2, 1, 0, 0, 1, 100, testCalculator, palette);
 
 		// Secondo la formula per calcolare la tonalità di grigio:
 		// 255 * 0 / 100 == 0
@@ -133,9 +130,7 @@ class FractalRendererTest {
 			return 50;
 		};
 
-		FractalRenderer testRenderer = new FractalRenderer(testCalculator);
-
-		int[] pixels = testRenderer.render(2, 2, 0, 0, 1, 100, palette);
+		int[] pixels = renderer.render(2, 2, 0, 0, 1, 100, testCalculator, palette);
 
 		assertEquals(4, calls[0]);
 
@@ -164,7 +159,7 @@ class FractalRendererTest {
 			}
 		};
 
-		int[] pixels = renderer.render(2, 2, 0.0, 0.0, 1.0, 100, palette);
+		int[] pixels = renderer.render(2, 2, 0.0, 0.0, 1.0, 100, calculator, palette);
 
 		for (int pixel : pixels) {
 			assertEquals(0xFFFF0000, pixel);
@@ -178,17 +173,7 @@ class FractalRendererTest {
 	void testNullPalette() {
 		assertThrows(NullPointerException.class,
 									() -> renderer.render(
-												2, 2, 0.0, 0.0, 1.0, 100, null
+												2, 2, 0.0, 0.0, 1.0, 100, calculator, null
 									));
-	}
-
-	/**
-	 * Verifica che non sia possibile creare un renderer
-	 * con un calcolatore nullo.
-	 */
-	@Test 
-	void testNullCalculator() {
-		assertThrows(NullPointerException.class,
-									() -> new FractalRenderer(null));
 	}
 }
