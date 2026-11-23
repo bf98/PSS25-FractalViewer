@@ -70,6 +70,20 @@ public final class FractalController {
 
 		model.setCenter(centerX, centerY);
 	}
+	
+	/**
+	 * Aggiorna la scala della visualizzazione applicando
+	 * un fattore di zoom rispetto al centro del frattale.
+	 * 
+	 * @param factor Il fattore di ingrandimento.
+	 * @throws IllegalArgumentException Se il frattale di ingrandimento non è valido.
+	 */
+	public void zoom(final double factor) {
+		if (!Double.isFinite(factor) || factor <= 0) {
+			throw new IllegalArgumentException("Fattore di zoom non valido");
+		}
+		model.setScale(model.getScale() / factor);
+	}
 
 	/**
 	 * Aggiorna la risoluzione della visualizzazione.
