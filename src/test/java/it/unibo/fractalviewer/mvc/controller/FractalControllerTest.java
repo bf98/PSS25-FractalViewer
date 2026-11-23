@@ -229,6 +229,22 @@ class FractalControllerTest {
 	}
 
 	/**
+	 * Verifica il ripristino della navigazione 
+	 * attraverso il FractalController.
+	 */
+	@Test
+	void testResetNavigation() {
+		controller.setCenter(1.0, 2.0);
+		controller.setScale(0.001);
+
+		controller.resetNavigation();
+
+		assertEquals(-0.5, model.getCenterX(), 1e-12);
+		assertEquals(0.0, model.getCenterY(), 1e-12);
+		assertEquals(0.005, model.getScale(), 1e-12);
+	}
+
+	/**
 	 * Verifica che il FractalController rifiuti parametri non validi
 	 * senza alterare lo stato del FractalModel.
 	 */
