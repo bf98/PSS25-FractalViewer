@@ -12,9 +12,13 @@ public final class FractalModel {
 	private int width = 640;
 	private int height = 480;
 
-	private double centerX = -0.5;
-	private double centerY = 0.0;
-	private double scale = 0.005;
+	private static final double DEFAULT_CENTER_X = -0.5;
+	private static final double DEFAULT_CENTER_Y = 0.0;
+	private static final double DEFAULT_SCALE = 0.005;
+
+	private double centerX = DEFAULT_CENTER_X;
+	private double centerY = DEFAULT_CENTER_Y;
+	private double scale = DEFAULT_SCALE; 
 
 	private int maxIterations = 100;
 
@@ -22,6 +26,15 @@ public final class FractalModel {
 	private ColorPalette palette = new GrayscalePalette();
 
 	private static final long MAX_PIXELS = 10_000_000L;
+
+	/**
+	 * Ripristina i parametri iniziali della navigazione.
+	 */
+	public void resetNavigation() {
+		this.centerX = DEFAULT_CENTER_X;
+		this.centerY = DEFAULT_CENTER_Y;
+		this.scale = DEFAULT_SCALE;
+	}
 
 	/**
 	 * Aggiorna la risoluzione dell'immagine.

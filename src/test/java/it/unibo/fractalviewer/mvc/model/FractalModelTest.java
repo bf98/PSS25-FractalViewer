@@ -93,6 +93,22 @@ class FractalModelTest {
 	}
 
 	/**
+	 * Verifica il ripristino dei parametri iniziali
+	 * della navigazione.
+	 */
+	@Test
+	void testResetNavigation() {
+		model.setCenter(1.0, 2.0);
+		model.setScale(0.001);
+
+		model.resetNavigation();
+
+		assertEquals(-0.5, model.getCenterX(), 1e-12);
+		assertEquals(0.0, model.getCenterY(), 1e-12);
+		assertEquals(0.005, model.getScale(), 1e-12);
+	}
+
+	/**
 	 * Verifica che i parametri non validi vengano rifiutati.
 	 */
 	@Test
