@@ -47,6 +47,31 @@ public final class FractalController {
 	}
 
 	/**
+	 * Aggiorna il centro della visualizzazione in funzione
+	 * dello spostamento effettuato sul canvas.
+	 *
+	 * Spiegazione del funzionamento:
+	 * Se il mouse viene trascinato verso destra, dobbiamo spostare
+	 * il centro della visualizzazione verso sinistra in modo da dare 
+	 * l'impressione che il frattale segua il mouse.
+	 *
+	 * Le formule utilizzate sono:
+	 * new_centerX = centerX - deltaX * scale
+	 * new_centerY = centerY + deltaY * scale
+	 *
+	 * @param deltaX Lo spostamento orizzontale in pixel.
+	 * @param deltaY Lo spostamento verticale in pixel.
+	 */
+	public void pan(final double deltaX, final double deltaY) {
+		double scale = model.getScale();
+
+		double centerX = model.getCenterX() - deltaX * scale;
+		double centerY = model.getCenterY() + deltaY * scale;
+
+		model.setCenter(centerX, centerY);
+	}
+
+	/**
 	 * Aggiorna la risoluzione della visualizzazione.
 	 *
 	 * @param width La nuova larghezza.
