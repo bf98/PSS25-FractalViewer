@@ -78,6 +78,24 @@ public final class FractalModel {
 	}
 
 	/**
+	 * Aggiorna contemporaneamente risoluzione e scala della visualizzazione.
+	 *
+	 * @param width La larghezza dell'immagine.
+	 * @param height L'altezza dell'immagine.
+	 * @param scale La dimensione di un pixel nel piano complesso.
+	 * @throws IllegalArgumentException Se i parametri non sono validi.
+	 */
+	public void setResolutionAndScale(final int width, final int height, final double scale) {
+		if (width <= 0 || height <= 0 || (long) width * height > MAX_PIXELS 
+				|| !Double.isFinite(scale) || scale <= 0) {
+					throw new IllegalArgumentException("Risoluzione o scala non valida.");
+				}
+		this.width = width;
+		this.height = height;
+		this.scale = scale;
+	}
+
+	/**
 	 * Aggiorna il numero massimo di iterazioni consentite.
 	 *
 	 * @param maxIterations Il numero massimo di iterazioni consentite.
