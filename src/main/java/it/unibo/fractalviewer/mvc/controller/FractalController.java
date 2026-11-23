@@ -86,6 +86,14 @@ public final class FractalController {
 	}
 
 	/**
+	 * Ripristina posizione e scala iniziali 
+	 * della visualizzazione.
+	 */
+	public void resetNavigation() {
+		model.resetNavigation();
+	}
+
+	/**
 	 * Aggiorna la risoluzione della visualizzazione.
 	 *
 	 * @param width La nuova larghezza.
