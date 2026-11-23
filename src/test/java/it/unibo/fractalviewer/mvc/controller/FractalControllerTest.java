@@ -84,6 +84,23 @@ class FractalControllerTest {
 	}
 
 	/**
+	 * Verifica l'aggiornamento del centro della visualizzazione
+	 * in seguito allo spostamento del frattale.
+	 */
+	@Test
+	void testPan() {
+		controller.setCenter(-0.5, 0.0);
+		controller.setScale(0.005);
+
+		controller.pan(100, 50);
+
+		// new_centerX = -0.5 - 100 * 0.005 == -1
+		assertEquals(-1.0, model.getCenterX(), 1e-12);
+		// new_centerY = 0.0 + 50 * 0.005 == 0.25
+		assertEquals(0.25, model.getCenterY(), 1e-12);
+	}
+
+	/**
 	 * Verifica l'aggiornamento della risoluzione.
 	 */
 	@Test
