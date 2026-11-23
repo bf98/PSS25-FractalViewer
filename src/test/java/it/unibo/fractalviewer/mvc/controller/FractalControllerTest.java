@@ -101,6 +101,58 @@ class FractalControllerTest {
 	}
 
 	/**
+	 * Verifica la riduzione della scala
+	 * in seguito a un ingrandimento del frattale.
+	 */
+	@Test
+	void testZoomIn() {
+		controller.setResolution(640, 480);
+		controller.setScale(0.005);
+
+		controller.zoom(2.0);
+	
+		// new_Scale = old_Scale / factor
+		// new_Scale = 0.005 / 2 == 0.0025
+		assertEquals(0.0025, model.getScale(), 1e-12);
+	}
+
+	/**
+	 * Verifica l'aumento della scala in seguito
+	 * a una riduzione dell'ingrandimento del frattale.
+	 */
+	@Test
+	void testZoomOut() {
+		controller.setResolution(640, 480);
+		controller.setScale(0.005);
+
+		controller.zoom(0.5);
+
+		// new_Scale = old_Scale / factor
+		// new_Scale = 0.005 / 0.5 == 0.010
+		assertEquals(0.01, model.getScale(), 1e-12);
+	}
+
+	/**
+	 * Verifica che fattori di zoom non validi vengano
+	 * rifiutati senza alterare lo stato del FractalModel.
+	 */
+	@Test
+	void testInvalidZoom() {
+		double prevScale = model.getScale();
+
+		assertThrows(IllegalArgumentException.class,
+									() -> controller.zoom(0));
+		assertThrows(IllegalArgumentException.class,
+									() -> controller.zoom(-1));
+		assertThrows(IllegalArgumentException.class,
+									() -> controller.zoom(Double.NaN));
+		assertThrows(IllegalArgumentException.class,
+									() -> controller.zoom(Double.POSITIVE_INFINITY));
+
+		assertEquals(prevScale, model.getScale());
+	}
+
+	/**
 	 * Verifica l'aggiornamento della risoluzione.
 	 */
 	@Test
