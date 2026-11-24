@@ -27,6 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.input.MouseButton;
 
 /**
  * Implementa la GUI dell'applicazione FractalViewer utilizzando JavaFX.
@@ -56,6 +57,13 @@ public final class JFXFractalAppGUI extends Application {
     /** Larghezza massima del campo per l'altezza del canvas, in pixel. */
     private static final int HEIGHTFIELD_WIDTH = 190;
 
+		// Fattore di zoom applicato a ogni movimento
+		// della rotellina del mouse.
+		private static final double ZOOM_FACTOR = 1.2;
+
+		private double lastMouseX;
+		private double lastMouseY;
+
     /**
      * Configura e visualizza la finestra principale dell'applicazione.
      * 
@@ -72,6 +80,7 @@ public final class JFXFractalAppGUI extends Application {
         BorderPane borderPane = new BorderPane();
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+				configureNavigation(canvas, controller);
         // Crea i pulsanti delle operazioni e l'area di testo per il log.
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
@@ -296,4 +305,47 @@ public final class JFXFractalAppGUI extends Application {
 				}
 			}
     }
+
+		/**
+		 * Configura gli eventi del mouse
+		 * relativi alla navigazione del frattale.
+		 *
+		 * @param canvas Il canvas della visualizzazione del frattale.
+		 * @param controller Il controller della visualizzazione.
+		 */
+		private void configureNavigation(final Canvas canvas, final FractalController controller) {
+			// Salva la posizione iniziale del puntatore.
+			canvas.setOnMousePressed(event -> {
+				if (event.getButton() == MouseButton.PRIMARY) {
+					lastMouseX = event.getX();
+					lastMouseY = event.getY();
+				}
+			});
+			// Aggiorna la posizione del frattale durante il trascinamento.
+			canvas.setOnMouseDragged(event -> {
+				if (event.isPrimaryButtonDown()) {
+					double deltaX = event.getX() - lastMouseX;
+					double deltaY = event.getY() - lastMouseY;
+
+					controller.pan(deltaX, deltaY);
+
+					lastMouseX = event.getX();
+					lastMouseY = event.getY();
+
+					renderFractal(canvas, controller.render());
+				}
+			});
+			// Aggiorna lo zoom attraverso la rotellina del mouse.
+			canvas.setOnScroll(event -> {
+				if (event.getDeltaY() != 0) {
+					double factor = event.getDeltaY() > 0 
+													? ZOOM_FACTOR
+													: 1.0 / ZOOM_FACTOR;
+					controller.zoom(factor);
+
+					renderFractal(canvas, controller.render());
+					event.consume();
+				}
+			});
+		}
 }
