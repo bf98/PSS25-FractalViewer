@@ -94,6 +94,33 @@ public final class FractalController {
 	}
 
 	/**
+	 * Aggiorna la risoluzione e adatta la scala della visualizzazione.
+	 *
+	 * @param width La larghezza della visualizzazione.
+	 * @param height L'altezza della visualizzazione.
+	 * @throws IllegalArgumentException Se i parametri non sono validi.
+	 */
+	public void resizeVisualization(final int width, final int height) {
+		int oldWidth = model.getWidth();
+		int oldHeight = model.getHeight();
+		double oldScale = model.getScale();
+
+		if (width <= 0 || height <= 0) {
+			throw new IllegalArgumentException("La risoluzione deve essere positiva.");
+		}
+
+		double widthRatio = (double) oldWidth / width;
+		double heightRatio = (double) oldHeight / height;
+		// new_scale = old_scale * max(old_width / width, old_height / height)
+		// Il rapporto maggiore mantiene visibile l'intera regione
+		// precedente, eventualmente mostrando spazio aggiuntivo.
+		double factor = Math.max(widthRatio, heightRatio);
+		double newScale = oldScale * factor;
+
+		model.setResolutionAndScale(width, height, newScale);
+	}
+
+	/**
 	 * Aggiorna la risoluzione della visualizzazione.
 	 *
 	 * @param width La nuova larghezza.
