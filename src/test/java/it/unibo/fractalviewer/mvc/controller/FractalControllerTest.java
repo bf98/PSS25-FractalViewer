@@ -245,6 +245,23 @@ class FractalControllerTest {
 	}
 
 	/**
+	 * Verifica l'adattamento della scala in seguito
+	 * a una modifica della risoluzione.
+	 */
+	@Test
+	void testResizeVisualization() {
+		controller.setResolution(640, 480);
+		controller.setScale(0.005);
+
+		controller.resizeVisualization(1280, 960);
+
+		assertEquals(1280, model.getWidth());
+		assertEquals(960, model.getHeight());
+		// new_scale = 0.005 * max(640 / 1280, 480 / 960) == 0.0025
+		assertEquals(0.0025, model.getScale());
+	}
+
+	/**
 	 * Verifica che il FractalController rifiuti parametri non validi
 	 * senza alterare lo stato del FractalModel.
 	 */
