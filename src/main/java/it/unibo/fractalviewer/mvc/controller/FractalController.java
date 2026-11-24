@@ -176,4 +176,8 @@ public final class FractalController {
 	public void setPalette(final ColorPalette palette) {
 		model.setPalette(palette);
 	}
+
+	public int getMaxIterations() {
+		return model.getMaxIterations();
+	}
 }
