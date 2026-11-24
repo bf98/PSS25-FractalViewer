@@ -91,7 +91,11 @@ public final class JFXFractalAppGUI extends Application {
         applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
-        resetNavigation.setOnAction(e-> textArea.appendText("Il frattale è gia nella posizione iniziale\n"));
+        resetNavigation.setOnAction(e -> {
+					controller.resetNavigation();
+					renderFractal(canvas, controller.render());
+					textArea.appendText("Posizione iniziale del frattale ripristinata.\n");
+				});
         // Crea i campi per il ridimensionamento del canvas.
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
