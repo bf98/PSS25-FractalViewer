@@ -59,12 +59,12 @@ public final class JFXFractalAppGUI extends Application {
     /** Larghezza massima del campo per l'altezza del canvas, in pixel. */
     private static final int HEIGHTFIELD_WIDTH = 190;
 
-		// Fattore di zoom applicato a ogni movimento
-		// della rotellina del mouse.
-		private static final double ZOOM_FACTOR = 1.2;
+	// Fattore di zoom applicato a ogni movimento
+	// della rotellina del mouse.
+	private static final double ZOOM_FACTOR = 1.2;
 
-		private double lastMouseX;
-		private double lastMouseY;
+	private double lastMouseX;
+	private double lastMouseY;
 
     /**
      * Configura e visualizza la finestra principale dell'applicazione.
@@ -73,34 +73,34 @@ public final class JFXFractalAppGUI extends Application {
      */
     @Override
     public void start(final Stage primaryStage) {
-				// Inizializza i componenti per la gestione e rendering del frattale.
-				FractalModel model = new FractalModel();
-				model.setResolution(canvasWidth, canvasHeight);
-				FractalRenderer renderer = new FractalRenderer();
-				FractalController controller = new FractalController(model, renderer);
+		// Inizializza i componenti per la gestione e rendering del frattale.
+		FractalModel model = new FractalModel();
+		model.setResolution(canvasWidth, canvasHeight);
+		FractalRenderer renderer = new FractalRenderer();
+		FractalController controller = new FractalController(model, renderer);
         // Crea il layout generale della GUI.
         BorderPane borderPane = new BorderPane();
         // Crea il canvas con le dimensioni iniziali definite nelle costanti.
         Canvas canvas = new Canvas(canvasWidth, canvasHeight);
-				configureNavigation(canvas, controller);
+		configureNavigation(canvas, controller);
         // Crea i pulsanti delle operazioni e l'area di testo per il log.
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
-				// Crea spinner per numero di iterazioni massime.
-				Spinner<Integer> iterationsSpinner = new Spinner<>(100, 1000, controller.getMaxIterations(), 50);
-				iterationsSpinner.setEditable(true);
-				iterationsSpinner.setPrefWidth(120);
+		// Crea spinner per numero di iterazioni massime.
+		Spinner<Integer> iterationsSpinner = new Spinner<>(100, 1000, controller.getMaxIterations(), 50);
+		iterationsSpinner.setEditable(true);
+		iterationsSpinner.setPrefWidth(120);
         // Crea il pannello di scorrimento per il canvas.
         ScrollPane sl = new ScrollPane();
         // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
         Button exportButton = new Button("Esportare il frattale");
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e -> {
-					controller.resetNavigation();
-					renderFractal(canvas, controller.render());
-					textArea.appendText("Posizione iniziale del frattale ripristinata.\n");
-				});
+			controller.resetNavigation();
+			renderFractal(canvas, controller.render());
+			textArea.appendText("Posizione iniziale del frattale ripristinata.\n");
+		});
         // Crea i campi per il ridimensionamento del canvas.
         TextField heightField = new TextField();
         heightField.setPromptText("Inserisci l'altezza del canvas...");
@@ -109,35 +109,35 @@ public final class JFXFractalAppGUI extends Application {
         widthField.setPromptText("Inserisci la larghezza del canvas...");
         widthField.setAlignment(Pos.CENTER);
         applyButton.setOnAction(e -> {
-					try {
-						// Legge le dimensioni inserite dall'utente.
-						int width = Integer.parseInt(widthField.getText().trim());
-						int height = Integer.parseInt(heightField.getText().trim());
+		    try {
+			    // Legge le dimensioni inserite dall'utente.
+				int width = Integer.parseInt(widthField.getText().trim());
+				int height = Integer.parseInt(heightField.getText().trim());
 
-						// Aggiorna risoluzione e scala nel FractalModel attraverso il metodo 
-						// del FractalController.
-						controller.resizeVisualization(width, height);
+				// Aggiorna risoluzione e scala nel FractalModel attraverso il metodo 
+				// del FractalController.
+				controller.resizeVisualization(width, height);
 						
-						// Aggiorna le dimensioni effettive del canvas.
-						canvas.setWidth(width);
-						canvas.setHeight(height);
+				// Aggiorna le dimensioni effettive del canvas.
+				canvas.setWidth(width);
+				canvas.setHeight(height);
 
-						// Disegna il frattale con la nuova risoluzione.
-						renderFractal(canvas, controller.render());
+				// Disegna il frattale con la nuova risoluzione.
+				renderFractal(canvas, controller.render());
 
-						textArea.appendText(
-								"Risoluzione aggiornata: " + width + "x" + height + "\n"
-						);
-					} catch (NumberFormatException ex) {
-						textArea.appendText(
-								"Inserire valori interi validi.\n"
-						);
-					} catch (IllegalArgumentException ex) {
-						textArea.appendText(
-								"Risoluzione non valida.\n"
-						);
-					}
-				});
+				textArea.appendText(
+					"Risoluzione aggiornata: " + width + "x" + height + "\n"
+				);
+			} catch (NumberFormatException ex) {
+				textArea.appendText(
+					"Inserire valori interi validi.\n"
+				);
+			} catch (IllegalArgumentException ex) {
+				textArea.appendText(
+					"Risoluzione non valida.\n"
+				);
+			}
+		});
         // Crea le opzioni disponibili per il tipo di frattale e la palette.
         ObservableList<String> fractals =FXCollections.observableArrayList
         (
@@ -156,17 +156,17 @@ public final class JFXFractalAppGUI extends Application {
 			(observable, oldFractal, newFractal) -> {
 				if (newFractal != null) {
 					switch (newFractal) {
-						    case "Mandelbrot":
-						        controller.setCalculator(new MandelbrotCalculator());
-						        break;
-					        case "Julia":
-						        controller.setCalculator(new JuliaCalculator());
-						        break;
-						    default:
-						        return;
-					    }
-					    renderFractal(canvas, controller.render());
-				    }
+						case "Mandelbrot":
+						    controller.setCalculator(new MandelbrotCalculator());
+						    break;
+					    case "Julia":
+						    controller.setCalculator(new JuliaCalculator());
+						    break;
+						default:
+						    return;
+					}
+					renderFractal(canvas, controller.render());
+				}
 			}
 		);
         // Stampa il nome del frattale quando è selezionato mediante un ascoltatore.
@@ -214,8 +214,8 @@ public final class JFXFractalAppGUI extends Application {
             (observable, oldPalette, newPalette) -> {
                 if (newPalette != null )
                 {
-										controller.setPalette(newPalette);
-										renderFractal(canvas, controller.render());
+					controller.setPalette(newPalette);
+					renderFractal(canvas, controller.render());
                     textArea.appendText(
                         "Palette selezionata " + newPalette.getName() + "\n"
                     );
@@ -273,7 +273,7 @@ public final class JFXFractalAppGUI extends Application {
         primaryStage.setMinWidth(700);
         primaryStage.setMinHeight(500);
         primaryStage.setResizable(true);
-				renderFractal(canvas, controller.render());
+		renderFractal(canvas, controller.render());
         primaryStage.show();
     }
 
@@ -351,58 +351,58 @@ public final class JFXFractalAppGUI extends Application {
      * @param palette Palette selezionata.
      */
     private void renderFractal(Canvas canvas, final int[] pixels) {
-			PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
+		PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
 
-			int width = (int) canvas.getWidth();
-			int height = (int) canvas.getHeight();
+		int width = (int) canvas.getWidth();
+		int height = (int) canvas.getHeight();
 
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					writer.setArgb(x, y, pixels[y * width + x]);
-				}
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				writer.setArgb(x, y, pixels[y * width + x]);
 			}
+		}
     }
 
-		/**
-		 * Configura gli eventi del mouse
-		 * relativi alla navigazione del frattale.
-		 *
-		 * @param canvas Il canvas della visualizzazione del frattale.
-		 * @param controller Il controller della visualizzazione.
-		 */
-		private void configureNavigation(final Canvas canvas, final FractalController controller) {
-			// Salva la posizione iniziale del puntatore.
-			canvas.setOnMousePressed(event -> {
-				if (event.getButton() == MouseButton.PRIMARY) {
-					lastMouseX = event.getX();
-					lastMouseY = event.getY();
-				}
-			});
-			// Aggiorna la posizione del frattale durante il trascinamento.
-			canvas.setOnMouseDragged(event -> {
-				if (event.isPrimaryButtonDown()) {
-					double deltaX = event.getX() - lastMouseX;
-					double deltaY = event.getY() - lastMouseY;
+	/**
+	 * Configura gli eventi del mouse
+	 * relativi alla navigazione del frattale.
+	 *
+	 * @param canvas Il canvas della visualizzazione del frattale.
+	 * @param controller Il controller della visualizzazione.
+	 */
+	private void configureNavigation(final Canvas canvas, final FractalController controller) {
+		// Salva la posizione iniziale del puntatore.
+		canvas.setOnMousePressed(event -> {
+		    if (event.getButton() == MouseButton.PRIMARY) {
+				lastMouseX = event.getX();
+				lastMouseY = event.getY();
+			}
+		});
+		// Aggiorna la posizione del frattale durante il trascinamento.
+		canvas.setOnMouseDragged(event -> {
+			if (event.isPrimaryButtonDown()) {
+			    double deltaX = event.getX() - lastMouseX;
+				double deltaY = event.getY() - lastMouseY;
 
-					controller.pan(deltaX, deltaY);
+				controller.pan(deltaX, deltaY);
 
-					lastMouseX = event.getX();
-					lastMouseY = event.getY();
+				lastMouseX = event.getX();
+				lastMouseY = event.getY();
 
-					renderFractal(canvas, controller.render());
-				}
-			});
-			// Aggiorna lo zoom attraverso la rotellina del mouse.
-			canvas.setOnScroll(event -> {
-				if (event.getDeltaY() != 0) {
-					double factor = event.getDeltaY() > 0 
-													? ZOOM_FACTOR
-													: 1.0 / ZOOM_FACTOR;
-					controller.zoom(factor);
+				renderFractal(canvas, controller.render());
+			}
+		});
+		// Aggiorna lo zoom attraverso la rotellina del mouse.
+		canvas.setOnScroll(event -> {
+			if (event.getDeltaY() != 0) {
+				double factor = event.getDeltaY() > 0 
+				? ZOOM_FACTOR
+				: 1.0 / ZOOM_FACTOR;
+				controller.zoom(factor);
 
-					renderFractal(canvas, controller.render());
-					event.consume();
-				}
-			});
-		}
+				renderFractal(canvas, controller.render());
+				event.consume();
+			}
+		});
+	}
 }
