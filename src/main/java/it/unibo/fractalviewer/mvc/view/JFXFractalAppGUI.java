@@ -20,6 +20,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -85,10 +87,13 @@ public final class JFXFractalAppGUI extends Application {
         Button applyButton = new Button("Applicare la risoluzione");
         TextArea textArea = new TextArea();
         textArea.setEditable(false);
+				// Crea spinner per numero di iterazioni massime.
+				Spinner<Integer> iterationsSpinner = new Spinner<>(100, 1000, controller.getMaxIterations(), 50);
+				iterationsSpinner.setEditable(true);
+				iterationsSpinner.setPrefWidth(120);
         // Crea il pannello di scorrimento per il canvas.
         ScrollPane sl = new ScrollPane();
         // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
-        applyButton.setOnAction(e -> textArea.appendText("Risoluzione non applicabile.\n"));
         Button exportButton = new Button("Esportare il frattale");
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e -> {
@@ -103,6 +108,36 @@ public final class JFXFractalAppGUI extends Application {
         TextField widthField = new TextField();
         widthField.setPromptText("Inserisci la larghezza del canvas...");
         widthField.setAlignment(Pos.CENTER);
+        applyButton.setOnAction(e -> {
+					try {
+						// Legge le dimensioni inserite dall'utente.
+						int width = Integer.parseInt(widthField.getText().trim());
+						int height = Integer.parseInt(heightField.getText().trim());
+
+						// Aggiorna risoluzione e scala nel FractalModel attraverso il metodo 
+						// del FractalController.
+						controller.resizeVisualization(width, height);
+						
+						// Aggiorna le dimensioni effettive del canvas.
+						canvas.setWidth(width);
+						canvas.setHeight(height);
+
+						// Disegna il frattale con la nuova risoluzione.
+						renderFractal(canvas, controller.render());
+
+						textArea.appendText(
+								"Risoluzione aggiornata: " + width + "x" + height + "\n"
+						);
+					} catch (NumberFormatException ex) {
+						textArea.appendText(
+								"Inserire valori interi validi.\n"
+						);
+					} catch (IllegalArgumentException ex) {
+						textArea.appendText(
+								"Risoluzione non valida.\n"
+						);
+					}
+				});
         // Crea le opzioni disponibili per il tipo di frattale e la palette.
         ObservableList<String> fractals =FXCollections.observableArrayList
         (
@@ -193,25 +228,43 @@ public final class JFXFractalAppGUI extends Application {
             fractalType,
             paletteType
         );
+		Label iterationsLabel = new Label("Iterazioni massime: ");
+		VBox iterationsBox = new VBox(5, iterationsLabel, iterationsSpinner);
+		Button applyIterationsButton = new Button("Applica iterazioni");
+		applyIterationsButton.setOnAction(e -> {
+			try {
+				iterationsSpinner.increment(0);
+				int iterations = iterationsSpinner.getValue();
+				controller.setMaxIterations(iterations);
+				renderFractal(canvas, controller.render());
+				textArea.appendText("Numero massimo di iterazioni aggiornato: " +
+					iterations + "\n");
+			} catch (IllegalArgumentException ex) {
+					textArea.appendText("Numero di iterazioni non valido.\n"); 
+			    }
+		});
+		iterationsBox.getChildren().add(applyIterationsButton);
+        iterationsBox.setAlignment(Pos.CENTER);
+        widthField.setMaxWidth(WIDTHFIELD_WIDTH);
+        heightField.setMaxWidth(HEIGHTFIELD_WIDTH);
+        // Crea la VBox contenenti i parametri per la gestione del frattale e il log.
         VBox configBox = new VBox(
-            20.0,
+            10.0,
+            iterationsBox,
+            widthField,
+            heightField,
             applyButton,
             exportButton,
             resetNavigation,
-            widthField,
-            heightField
+            textArea
         );
-        widthField.setMaxWidth(WIDTHFIELD_WIDTH);
-        heightField.setMaxWidth(HEIGHTFIELD_WIDTH);
         configBox.setAlignment(Pos.CENTER);
-        // Crea la VBox contenenti i parametri per la gestione del frattale e il log.
-        VBox paramBox = new VBox(configBox, textArea);
         VBox.setVgrow(configBox, Priority.SOMETIMES);
         VBox.setVgrow(textArea, Priority.SOMETIMES);
         // Configura il canvas e il comportamento dell'exportButton.
         exportButton.setOnAction(e -> handleExport(canvas, textArea, primaryStage));
         sl.setContent(canvas);
-        borderPane.setRight(paramBox);
+        borderPane.setRight(configBox);
         borderPane.setBottom(fractalOptions);
         borderPane.setCenter(sl);     
         Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
