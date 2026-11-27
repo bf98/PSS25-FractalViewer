@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import it.unibo.fractalviewer.mvc.model.*;
 
+import java.util.function.Supplier;
+
 /**
  * Test della classe FractalController.
  *
@@ -53,6 +55,32 @@ class FractalControllerTest {
 		assertEquals(200 * 100, pixels.length);
 
 		assertEquals(0xFF0C0C0C, pixels[0]);
+	}
+
+	/**
+	 * Verifica che il rendering preparato utilizzi
+	 * la configurazione presente al momento della richiesta,
+	 * anche se il FractalModel viene modificato successivamente.
+	 */
+	@Test
+	void testPrepareRender() {
+		controller.setResolution(100, 100);
+		controller.setScale(0.005);
+		controller.setMaxIterations(100);
+
+		// Ottiene i parametri iniziali.
+		Supplier<int[]> operation = controller.prepareRender();
+
+		// Modifica i parametri prima di eseguire il rendering.
+		controller.setResolution(200, 200);
+		controller.setScale(0.001);
+		controller.setMaxIterations(500);
+
+		int[] pixels = operation.get();
+
+		// Controlliamo se il rendering abbia utilizzato la 
+		// risoluzione originale.
+		assertEquals(100 * 100, pixels.length);
 	}
 
 	/**
