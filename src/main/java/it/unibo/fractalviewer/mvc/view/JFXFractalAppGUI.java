@@ -4,6 +4,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
+
+import javafx.concurrent.Task;
+
 import it.unibo.fractalviewer.mvc.model.*;
 import it.unibo.fractalviewer.mvc.controller.*;
 
@@ -98,7 +104,7 @@ public final class JFXFractalAppGUI extends Application {
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e -> {
 					controller.resetNavigation();
-					renderFractal(canvas, controller.render());
+					renderAsync(canvas, controller);
 					textArea.appendText("Posizione iniziale del frattale ripristinata.\n");
 				});
         // Crea i campi per il ridimensionamento del canvas.
@@ -123,7 +129,7 @@ public final class JFXFractalAppGUI extends Application {
 						canvas.setHeight(height);
 
 						// Disegna il frattale con la nuova risoluzione.
-						renderFractal(canvas, controller.render());
+						renderAsync(canvas, controller);
 
 						textArea.appendText(
 								"Risoluzione aggiornata: " + width + "x" + height + "\n"
@@ -165,7 +171,7 @@ public final class JFXFractalAppGUI extends Application {
 						    default:
 						        return;
 					    }
-					    renderFractal(canvas, controller.render());
+							renderAsync(canvas, controller);
 				    }
 			}
 		);
@@ -215,7 +221,7 @@ public final class JFXFractalAppGUI extends Application {
                 if (newPalette != null )
                 {
 										controller.setPalette(newPalette);
-										renderFractal(canvas, controller.render());
+										renderAsync(canvas, controller);
                     textArea.appendText(
                         "Palette selezionata " + newPalette.getName() + "\n"
                     );
@@ -236,7 +242,7 @@ public final class JFXFractalAppGUI extends Application {
 				iterationsSpinner.increment(0);
 				int iterations = iterationsSpinner.getValue();
 				controller.setMaxIterations(iterations);
-				renderFractal(canvas, controller.render());
+				renderAsync(canvas, controller);
 				textArea.appendText("Numero massimo di iterazioni aggiornato: " +
 					iterations + "\n");
 			} catch (IllegalArgumentException ex) {
@@ -273,9 +279,33 @@ public final class JFXFractalAppGUI extends Application {
         primaryStage.setMinWidth(700);
         primaryStage.setMinHeight(500);
         primaryStage.setResizable(true);
-				renderFractal(canvas, controller.render());
+				renderAsync(canvas, controller);
         primaryStage.show();
     }
+
+		/**
+		 * Executor dedicato all'esecuzione dei rendering
+		 * su un thread separato da quello di JavaFX.
+		 */
+		private final ExecutorService renderExecutor = 
+						Executors.newSingleThreadExecutor(r -> {
+							Thread thread = new Thread(r, "fractal-render");
+							thread.setDaemon(true);
+							return thread;
+						}
+		);
+
+		/**
+		 * Ultimo task di rendering richiesto.
+		 */
+		private Task<int[]> currentRenderTask;
+
+		/** 
+		 * Identificativo delle richieste di rendering.
+		 * Permette di ignorare i risultati non più
+		 * attuali.
+		 */
+		private long renderVersion;
 
     /**
      * Entry point's class.
@@ -364,6 +394,71 @@ public final class JFXFractalAppGUI extends Application {
     }
 
 		/**
+		 * Esegue il rendering del frattale in background,
+		 * evitando di bloccare la GUI JavaFX.
+		 * Il canvas viene aggiornato soltanto quando termina
+		 * la richiesta di rendering più recente.
+		 *
+		 * @param canvas Il canvas su cui disegnare il frattale.
+		 * @param controller Il controller della visualizzazione.
+		 */
+		private void renderAsync(final Canvas canvas, final FractalController controller) {
+			// Assegna un ID alla nuova richiesta.
+			final long version = ++renderVersion;
+
+			// Richiede l'annullamento del task precedente.
+			if (currentRenderTask != null) {
+				currentRenderTask.cancel(true);
+			}
+
+			// Ottiene i parametri correnti sul thread JavaFX.
+			final Supplier<int[]> operation = controller.prepareRender();
+
+			// Definisce l'operazione da eseguire in background.
+			Task<int[]> task = new Task<>() {
+				@Override
+				protected int[] call() {
+					return operation.get();
+				}
+			};
+
+			currentRenderTask = task;
+
+			// Aggiorna il canvas sul thread JavaFX
+			// soltanto se il risultato è ancora attuale.
+			task.setOnSucceeded(event -> {
+				if (version == renderVersion) {
+					renderFractal(canvas, task.getValue());
+				}
+			});
+
+			// Segnala eventuali errori della richiesta corrente.
+			task.setOnFailed(event -> {
+				if (version == renderVersion) {
+					task.getException().printStackTrace();
+				}
+			});
+			
+			// Inserisce il task nell'executor.
+			renderExecutor.execute(task);
+		}
+
+		/**
+		 * Richiede la terminazione dei task di rendering
+		 * durante la chiusura del programma.
+		 * Il metodo viene richiamato automaticamente da JavaFX
+		 * alla chiusura del programma.
+		 */
+		@Override
+		public void stop() {
+			if (currentRenderTask != null) {
+				currentRenderTask.cancel(true);
+			}
+
+			renderExecutor.shutdownNow();
+		}
+
+		/**
 		 * Configura gli eventi del mouse
 		 * relativi alla navigazione del frattale.
 		 *
@@ -389,7 +484,7 @@ public final class JFXFractalAppGUI extends Application {
 					lastMouseX = event.getX();
 					lastMouseY = event.getY();
 
-					renderFractal(canvas, controller.render());
+					renderAsync(canvas, controller);
 				}
 			});
 			// Aggiorna lo zoom attraverso la rotellina del mouse.
@@ -400,7 +495,7 @@ public final class JFXFractalAppGUI extends Application {
 													: 1.0 / ZOOM_FACTOR;
 					controller.zoom(factor);
 
-					renderFractal(canvas, controller.render());
+					renderAsync(canvas, controller);
 					event.consume();
 				}
 			});
