@@ -72,6 +72,9 @@ public final class JFXFractalAppGUI extends Application {
 		private double lastMouseX;
 		private double lastMouseY;
 
+		private final Button exportButton = new Button("Esportare il frattale");
+		private final TextArea textArea = new TextArea();
+
     /**
      * Configura e visualizza la finestra principale dell'applicazione.
      * 
@@ -91,7 +94,6 @@ public final class JFXFractalAppGUI extends Application {
 				configureNavigation(canvas, controller);
         // Crea i pulsanti delle operazioni e l'area di testo per il log.
         Button applyButton = new Button("Applicare la risoluzione");
-        TextArea textArea = new TextArea();
         textArea.setEditable(false);
 				// Crea spinner per numero di iterazioni massime.
 				Spinner<Integer> iterationsSpinner = new Spinner<>(100, 1000, controller.getMaxIterations(), 50);
@@ -99,8 +101,6 @@ public final class JFXFractalAppGUI extends Application {
 				iterationsSpinner.setPrefWidth(120);
         // Crea il pannello di scorrimento per il canvas.
         ScrollPane sl = new ScrollPane();
-        // Assegna il messaggio restituito dai pulsanti e il testo che mostrano.
-        Button exportButton = new Button("Esportare il frattale");
         Button resetNavigation = new Button("Resetta la navigazione del frattale alla posizione iniziale");
         resetNavigation.setOnAction(e -> {
 					controller.resetNavigation();
@@ -406,6 +406,9 @@ public final class JFXFractalAppGUI extends Application {
 			// Assegna un ID alla nuova richiesta.
 			final long version = ++renderVersion;
 
+			// Disabilita l'esportazione durante il calcolo.
+			exportButton.setDisable(true);
+
 			// Richiede l'annullamento del task precedente.
 			if (currentRenderTask != null) {
 				currentRenderTask.cancel(true);
@@ -429,12 +432,17 @@ public final class JFXFractalAppGUI extends Application {
 			task.setOnSucceeded(event -> {
 				if (version == renderVersion) {
 					renderFractal(canvas, task.getValue());
+					// Riabilitiamo l'esportazione, ora dell'immagine aggiornata.
+					exportButton.setDisable(false);
 				}
 			});
 
 			// Segnala eventuali errori della richiesta corrente.
 			task.setOnFailed(event -> {
 				if (version == renderVersion) {
+					textArea.appendText(
+							"Errore durante il rendering del frattale.\n"
+					);
 					task.getException().printStackTrace();
 				}
 			});
