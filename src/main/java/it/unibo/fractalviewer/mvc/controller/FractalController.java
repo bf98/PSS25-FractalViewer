@@ -1,6 +1,7 @@
 package it.unibo.fractalviewer.mvc.controller;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import it.unibo.fractalviewer.mvc.model.FractalModel;
 import it.unibo.fractalviewer.mvc.model.FractalCalculator;
@@ -44,6 +45,38 @@ public final class FractalController {
 			model.getCalculator(),
 			model.getPalette()
 		);
+	}
+
+	/**
+	 * Prepara un'operazione di rendering utilizzando i parametri
+	 * correnti della visualizzazione.
+	 * I parametri vengono acquisiti prima dell'esecuzione,
+	 * evitando che successive modifiche al FractalModel li alterino.
+	 *
+	 * @return Operazione per generare i pixel del frattale.
+	 */
+	public Supplier<int[]> prepareRender() {
+		final int width = model.getWidth();
+		final int height = model.getHeight();
+		final double centerX = model.getCenterX();
+		final double centerY = model.getCenterY();
+		final double scale = model.getScale();
+		final int maxIterations = model.getMaxIterations();
+
+		final FractalCalculator calculator = model.getCalculator();
+		final ColorPalette palette = model.getPalette();
+
+		// Restituiamo l'operazione senza eseguire subito
+		// il rendering.
+		return () -> renderer.render(
+													width,
+													height,
+													centerX,
+													centerY,
+													scale,
+													maxIterations,
+													calculator,
+													palette);
 	}
 
 	/**
