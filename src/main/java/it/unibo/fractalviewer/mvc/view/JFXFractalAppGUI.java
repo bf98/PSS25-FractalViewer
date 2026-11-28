@@ -375,10 +375,10 @@ public final class JFXFractalAppGUI extends Application {
     }
 
     /**
-     * Renderizza il frattale per applicare la palette selezionata.
-     * @param calculator Algoritmo utilizzato per calcolare il frattale.
-     * @param canvas Canvas contenente il frattale.
-     * @param palette Palette selezionata.
+     * Disegna sul canvas i pixel del frattale.
+		 *
+     * @param canvas Il Canvas contenente il frattale.
+     * @param pixels L'array dei pixel da disegnare.
      */
     private void renderFractal(Canvas canvas, final int[] pixels) {
 			PixelWriter writer = canvas.getGraphicsContext2D().getPixelWriter();
